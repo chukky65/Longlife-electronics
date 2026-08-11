@@ -13,7 +13,7 @@ import { SEO } from '../components/ui/SEO';
 import { NewsletterModal } from '../components/ui/NewsletterModal';
 import { FloatingWhatsApp } from '../components/layout/FloatingWhatsApp';
 import promoBannerImg from '../assets/images/promo_appliances_3d.png';
-import storeTourImg from '../assets/images/store_tour_3d.png';
+import storeTourImg from '../assets/store-tour.png';
 
 export const Home = () => {
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
