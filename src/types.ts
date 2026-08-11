@@ -13,6 +13,22 @@ export type Category =
   | 'Fans'
   | 'Accessories';
 
+export const CATEGORIES: Category[] = [
+  'Refrigerators',
+  'LED & Smart TVs',
+  'Home Theater',
+  'Air Conditioners',
+  'Washing Machines',
+  'Water Dispensers',
+  'Microwaves',
+  'Small Appliances',
+  'Generators & Power',
+  'Furniture',
+  'Electricals & Cables',
+  'Fans',
+  'Accessories'
+];
+
 export interface Product {
   id: string;
   name: string;

@@ -5,12 +5,7 @@ import { supabase } from '../lib/supabase';
 import { ProductCard } from '../components/ui/ProductCard';
 import { PriceRangeFilter } from '../components/ui/PriceRangeFilter';
 import { SEO } from '../components/ui/SEO';
-import { Category, Product } from '../types';
-
-const CATEGORIES: Category[] = [
-  'Refrigerators', 'LED & Smart TVs', 'Home Theater', 
-  'Air Conditioners', 'Washing Machines', 'Water Dispensers', 'Microwaves'
-];
+import { Category, Product, CATEGORIES } from '../types';
 
 export const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();

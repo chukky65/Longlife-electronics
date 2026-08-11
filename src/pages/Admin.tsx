@@ -4,14 +4,8 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recha
 import { useStore } from '../store';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Product, Category } from '../types';
+import { Product, Category, CATEGORIES } from '../types';
 import productsToImport from '../importData.json';
-
-const CATEGORIES: Category[] = [
-  'Refrigerators', 'LED & Smart TVs', 'Home Theater', 
-  'Air Conditioners', 'Washing Machines', 'Water Dispensers', 'Microwaves', 'Small Appliances',
-  'Generators & Power', 'Furniture', 'Electricals & Cables', 'Fans', 'Accessories'
-];
 
 export const Admin = () => {
   const navigate = useNavigate();
