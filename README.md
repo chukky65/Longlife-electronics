@@ -1,20 +1,29 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Longlife Electronics
 
-# Run and deploy your AI Studio app
+A premium e-commerce platform for Longlife Electronics, built with React, Vite, and Supabase.
 
-This contains everything you need to run your app locally.
+## Features
+- **3D Interactive Hero**: Built with Spline.
+- **Dynamic Routing**: Client-side routing with React Router.
+- **Product Catalog**: Fetching live products with filtering and pagination.
+- **Admin Dashboard**: Full CRUD access for products, promo codes, and order management.
+- **Cart & Checkout**: Complete checkout flow.
 
-View your app in AI Studio: https://ai.studio/apps/b4b3b4ba-c8bd-4790-b2ba-623f49cb8a15
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
+## Getting Started
 
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+   ```bash
+   npm install --legacy-peer-deps
+   ```
+
+2. Configure Environment:
+   Create a `.env.local` file with your Supabase keys:
+   ```
+   VITE_SUPABASE_URL=YOUR_URL
+   VITE_SUPABASE_ANON_KEY=YOUR_KEY
+   ```
+
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
