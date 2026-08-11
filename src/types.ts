@@ -41,6 +41,7 @@ export interface Product {
   image: string;
   gallery: string[];
   inStock: boolean;
+  stock: number;
   rating: number;
   reviewsCount: number;
   specs: Record<string, string>;

@@ -28,6 +28,7 @@ export const Admin = () => {
     in_stock: true,
     is_new: false,
     is_popular: false,
+    stock: '',
     specs: '{}'
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -274,6 +275,7 @@ const handleBulkImport = async () => {
         in_stock: product.in_stock,
         is_new: product.is_new,
         is_popular: product.is_popular,
+        stock: product.stock?.toString() || '0',
         specs: JSON.stringify(product.specs || {})
       });
     } else {
@@ -288,6 +290,7 @@ const handleBulkImport = async () => {
         in_stock: true,
         is_new: false,
         is_popular: false,
+        stock: '0',
         specs: '{}'
       });
     }
@@ -336,6 +339,7 @@ const handleBulkImport = async () => {
         in_stock: formData.in_stock,
         is_new: formData.is_new,
         is_popular: formData.is_popular,
+        stock: parseInt(formData.stock) || 0,
         specs: parsedSpecs,
         image: imageUrl || 'https://via.placeholder.com/400'
       };
@@ -638,8 +642,8 @@ const handleBulkImport = async () => {
                           <td className="px-6 py-4 text-gray-500 dark:text-gray-400">{p.category}</td>
                           <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">₦{p.price.toLocaleString()}</td>
                           <td className="px-6 py-4">
-                            <span className={`px-2 py-1 rounded text-xs font-bold ${p.in_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                              {p.in_stock ? 'In Stock' : 'Out of Stock'}
+                            <span className={`px-2 py-1 rounded text-xs font-bold ${p.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                              {p.stock > 0 ? `${p.stock} in stock` : 'Out of Stock'}
                             </span>
                           </td>
                           <td className="px-6 py-4 text-right flex justify-end gap-2">
@@ -849,6 +853,11 @@ const handleBulkImport = async () => {
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Original Price (optional)</label>
                   <input type="number" value={formData.original_price} onChange={e => setFormData({...formData, original_price: e.target.value})} className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 rounded focus:outline-none focus:border-red-600" />
+                </div>
+                
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Stock Quantity</label>
+                  <input type="number" required value={formData.stock} onChange={e => setFormData({...formData, stock: e.target.value})} className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 rounded focus:outline-none focus:border-red-600" />
                 </div>
                 
                 <div>

@@ -83,6 +83,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               Sale
             </span>
           )}
+          {product.stock <= 0 && (
+            <span className="bg-gray-800 text-white text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5">
+              Out of Stock
+            </span>
+          )}
         </div>
 
         <div className="absolute top-2 right-2 flex flex-col gap-1.5 z-10 opacity-0 group-hover:opacity-100 transition-all">
@@ -141,7 +146,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </a>
             <button 
               onClick={() => addToCart(product)}
-              disabled={!product.inStock}
+              disabled={product.stock <= 0}
               className="h-7 w-7 bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center hover:bg-red-600 dark:hover:bg-red-600 hover:text-white dark:hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
               aria-label="Add to cart"
             >

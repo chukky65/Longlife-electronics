@@ -77,8 +77,9 @@ export const Cart = () => {
                           className="w-8 text-center bg-transparent border-none focus:ring-0 text-[11px] font-bold text-slate-900 dark:text-white p-0"
                         />
                         <button 
-                          className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                          className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white disabled:opacity-50"
                           onClick={() => updateCartQuantity(product.id, quantity + 1)}
+                          disabled={quantity >= product.stock}
                         >+</button>
                       </div>
                     </div>

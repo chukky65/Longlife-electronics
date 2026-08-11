@@ -152,10 +152,11 @@ export const ProductDetails = () => {
                 <a href="#reviews" className="text-[11px] font-bold uppercase tracking-widest text-slate-500 hover:text-red-600 transition-colors">
                   {product.reviewsCount} Reviews
                 </a>
-                <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                <span className={`text-[11px] font-bold uppercase tracking-widest ${product.inStock ? 'text-green-600' : 'text-red-600'}`}>
-                  {product.inStock ? 'In Stock in Asaba' : 'Out of Stock'}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className={`inline-flex items-center justify-center px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest ${product.stock > 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                    {product.stock > 0 ? `${product.stock} In Stock` : 'Out of Stock'}
+                  </span>
+                </div>
               </div>
 
               <div className="flex items-end gap-3 mb-6 pb-6 border-b border-slate-100 dark:border-slate-800">
@@ -178,26 +179,28 @@ export const ProductDetails = () => {
                 <div className="flex gap-3">
                   <div className="w-32 flex items-center border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900">
                     <button 
-                      className="w-10 h-full flex items-center justify-center text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                      className="w-10 h-full flex items-center justify-center text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white disabled:opacity-50"
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      disabled={product.stock <= 0}
                     >-</button>
                     <input 
                       type="number" 
-                      value={quantity}
+                      value={product.stock <= 0 ? 0 : quantity}
                       readOnly
                       className="w-full text-center bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white font-bold text-[13px]"
                     />
                     <button 
-                      className="w-10 h-full flex items-center justify-center text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-                      onClick={() => setQuantity(quantity + 1)}
+                      className="w-10 h-full flex items-center justify-center text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white disabled:opacity-50"
+                      onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                      disabled={product.stock <= 0 || quantity >= product.stock}
                     >+</button>
                   </div>
                   <button 
                     onClick={() => addToCart(product, quantity)}
-                    disabled={!product.inStock}
+                    disabled={product.stock <= 0}
                     className="flex-1 bg-slate-900 hover:bg-red-600 dark:bg-white dark:hover:bg-red-600 dark:text-slate-900 dark:hover:text-white text-white font-bold py-3 px-6 text-[11px] uppercase tracking-widest transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    <ShoppingCart size={16} /> Add to Cart
+                    <ShoppingCart size={16} /> {product.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
                   </button>
                 </div>
                 

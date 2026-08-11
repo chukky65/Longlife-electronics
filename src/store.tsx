@@ -211,17 +211,34 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const addToCart = async (product: Product, quantity = 1) => {
+    let quantityAdded = 0;
     setCart(prev => {
       const existing = prev.find(item => item.product.id === product.id);
+      
       if (existing) {
+        const newQty = Math.min(product.stock, existing.quantity + quantity);
+        quantityAdded = newQty - existing.quantity;
+        if (quantityAdded === 0) return prev;
+        
         return prev.map(item => 
           item.product.id === product.id 
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: newQty }
             : item
         );
       }
-      return [...prev, { product, quantity }];
+      
+      quantityAdded = Math.min(product.stock, quantity);
+      if (quantityAdded === 0) return prev;
+      
+      return [...prev, { product, quantity: quantityAdded }];
     });
+    
+    // We didn't add anything, so don't toast or update DB
+    if (quantityAdded === 0) {
+      toast(`Cannot add more ${product.name}, stock limit reached`, 'error');
+      return;
+    }
+    
     toast(`Added ${product.name} to cart`);
 
     if (user) {
@@ -248,9 +265,16 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       removeFromCart(productId);
       return;
     }
-    setCart(prev => prev.map(item => 
-      item.product.id === productId ? { ...item, quantity } : item
-    ));
+    
+    setCart(prev => {
+      const item = prev.find(i => i.product.id === productId);
+      if (!item) return prev;
+      
+      const newQty = Math.min(item.product.stock, quantity);
+      return prev.map(i => 
+        i.product.id === productId ? { ...i, quantity: newQty } : i
+      );
+    });
 
     if (user) {
       await supabase.from('cart_items').update({ quantity }).eq('user_id', user.id).eq('product_id', productId);

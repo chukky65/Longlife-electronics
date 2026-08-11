@@ -13,7 +13,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Qasa Blender Big Size",
@@ -29,7 +30,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Boscon Electric Kettle",
@@ -45,7 +47,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 3
   },
   {
     "name": "Qasa Electric Pressing Iron",
@@ -61,7 +64,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "Qasa Steam/Spray Electric Iron",
@@ -77,7 +81,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "Century Pressing Iron",
@@ -93,7 +98,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "Qasa 18-Inch Rechargeable Fan",
@@ -109,7 +115,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Qasa 18-Inch Standing Fan - Premium Model",
@@ -125,7 +132,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Qasa 18-Inch Standing Fan - Standard Model",
@@ -141,7 +149,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Qasa 16-Inch Standing Fan",
@@ -157,7 +166,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Kiki Hair Clipper",
@@ -173,7 +183,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 4
   },
   {
     "name": "3KVA Volt Stabilizer 2000W",
@@ -189,7 +200,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Century 2000W Stabilizer",
@@ -205,7 +217,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Firman SPG3000 Generator",
@@ -221,7 +234,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Firman SPG3000E2 Generator",
@@ -237,7 +251,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "1/2mm 200 Extension Cable",
@@ -253,7 +268,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "Power Surge Protector (CV Guard)",
@@ -269,7 +285,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 10
   },
   {
     "name": "3 Meter HDMI Cable",
@@ -285,7 +302,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 3
   },
   {
     "name": "1.5 Meter HDMI Cable",
@@ -301,7 +319,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 3
   },
   {
     "name": "5 Meter HDMI Cable",
@@ -317,7 +336,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 3
   },
   {
     "name": "AKT Extension Socket",
@@ -333,7 +353,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Hisense AC Remote Control",
@@ -349,7 +370,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "Hisense Smart TV Remote Control",
@@ -365,7 +387,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "Hisense Non-Smart TV Remote Control",
@@ -381,7 +404,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "APC Extension Socket",
@@ -397,7 +421,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "6815 Extension Socket",
@@ -413,7 +438,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "15W45 Extension Socket",
@@ -429,7 +455,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "20B5 Extension Socket",
@@ -445,7 +472,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "085 Extension Socket with 11 USB Ports",
@@ -461,7 +489,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "6855 Extension Socket",
@@ -477,7 +506,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "3310 Extension Socket",
@@ -493,7 +523,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "916 Extension Socket",
@@ -509,7 +540,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "POS Extension Socket",
@@ -525,7 +557,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Shure Extension Socket",
@@ -541,7 +574,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "JPC Extension Socket",
@@ -557,7 +591,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "C140 Dining Table (Black)",
@@ -573,7 +608,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "Pizza Dining Table (Black)",
@@ -589,7 +625,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "Pizza Dining Table (White)",
@@ -605,7 +642,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "2-in-1 Marble Top Center Table",
@@ -621,7 +659,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "3-in-1 Marble Top Center Table",
@@ -637,7 +676,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "3-in-1 Wooden Center Table (White/Black)",
@@ -653,7 +693,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "Office Chair (Black Leg Model)",
@@ -669,7 +710,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 3
   },
   {
     "name": "Office Chair (Biggest Size)",
@@ -685,7 +727,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Office Chair With Headrest",
@@ -701,7 +744,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "Office Chair Without Headrest",
@@ -717,7 +761,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "Hisense HC245H Deep Freezer",
@@ -733,7 +778,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "LG 8kg Washing Machine",
@@ -749,7 +795,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Hisense 7.5kg Washing Machine",
@@ -765,7 +812,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Hisense 140W Soundbar",
@@ -781,7 +829,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Hisense 200W Soundbar",
@@ -797,7 +846,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Hisense 1HP Inverter AC (AS09DK)",
@@ -813,7 +863,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Hisense 1.5HP Inverter AC (AS12DK)",
@@ -829,7 +880,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Max 20L Microwave",
@@ -845,7 +897,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Hisense 20L Microwave",
@@ -861,7 +914,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Hisense 0932T Fridge",
@@ -877,7 +931,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Hisense 1203T Fridge",
@@ -893,7 +948,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Hisense 190SH Deep Freezer",
@@ -909,7 +965,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Hisense 32-Inch Smart TV",
@@ -925,7 +982,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "Hisense 43-Inch Smart TV",
@@ -941,7 +999,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "OX Plastic Standing Fan",
@@ -957,7 +1016,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "Ava 18-Inch Plastic Fan",
@@ -973,7 +1033,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 2
   },
   {
     "name": "Golden Breeze Table Fan",
@@ -989,7 +1050,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "LG 12-Inch Rechargeable Table Fan",
@@ -1005,7 +1067,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Eco 18-Inch Rechargeable Fan",
@@ -1021,7 +1084,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Jekiyas 18-Inch Rechargeable Fan",
@@ -1037,7 +1101,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "OX 18-Inch Industrial Fan",
@@ -1053,7 +1118,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "OX 20-Inch Industrial Fan",
@@ -1069,7 +1135,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "OX 26-Inch Industrial Fan",
@@ -1085,7 +1152,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "Golden Breeze 18-Inch Fan",
@@ -1101,7 +1169,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "BB Pro 18-Inch Fan",
@@ -1117,7 +1186,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "BB Wall 18-Inch Fan",
@@ -1133,7 +1203,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "My Fan 18-Inch Fan",
@@ -1149,7 +1220,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "1HP AC Kit",
@@ -1165,7 +1237,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "1.5HP AC Kit",
@@ -1181,7 +1254,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 1
   },
   {
     "name": "AC Outdoor Hanger",
@@ -1197,7 +1271,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 3
   },
   {
     "name": "32-Inch TV Wall Hanger",
@@ -1213,7 +1288,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 3
   },
   {
     "name": "43-Inch TV Wall Hanger",
@@ -1229,7 +1305,8 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 3
   },
   {
     "name": "55-Inch TV Wall Hanger",
@@ -1245,6 +1322,7 @@
     "in_stock": true,
     "is_new": true,
     "is_popular": false,
-    "specs": {}
+    "specs": {},
+    "stock": 3
   }
 ]
