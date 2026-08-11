@@ -227,15 +227,14 @@ export const Home = () => {
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-4">Real Store. Real Products. Real People.</h2>
           <p className="text-gray-500 dark:text-gray-400 mb-10 max-w-2xl mx-auto">We are not just an online store. We have a physical presence in Asaba ready to serve you.</p>
           
-          <div className="aspect-video w-full max-w-4xl mx-auto bg-gray-200 dark:bg-gray-800 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800">
-            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white p-6">
-              <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center mb-4 cursor-pointer hover:scale-110 transition-transform">
+          <div className="aspect-video w-full max-w-4xl mx-auto bg-gray-200 dark:bg-gray-800 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-2xl border border-gray-100 dark:border-gray-800 group cursor-pointer">
+            <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-all duration-500 z-10 flex flex-col items-center justify-center text-white p-6">
+              <div className="w-20 h-20 bg-red-600/90 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-2xl">
                 <svg className="w-8 h-8 ml-2" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
               </div>
-              <p className="font-medium text-lg">Watch our store tour video</p>
-              <p className="text-sm opacity-80 mt-2">[Video embed placeholder]</p>
+              <p className="font-bold text-xl md:text-2xl tracking-widest uppercase drop-shadow-md">Watch Our Store Tour</p>
             </div>
-            <img src="https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?auto=format&fit=crop&q=80&w=1200" alt="Store Front" className="w-full h-full object-cover" />
+            <img src="https://images.unsplash.com/photo-1555664424-778a1e5e1b48?auto=format&fit=crop&q=80&w=1200" alt="Electronics Store Front" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
           </div>
         </div>
       </section>
