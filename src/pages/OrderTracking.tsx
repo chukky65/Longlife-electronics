@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { PackageSearch, ArrowRight, Truck, CheckCircle2, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export const OrderTracking = () => {
-  const [orderId, setOrderId] = useState('');
+  const [searchParams] = useSearchParams();
+  const initialId = searchParams.get('id') || '';
+  const [orderId, setOrderId] = useState(initialId);
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -34,6 +37,12 @@ export const OrderTracking = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (initialId) {
+      handleTrack({ preventDefault: () => {} } as any);
+    }
+  }, [initialId]);
   return (
     <div className="bg-gray-50 dark:bg-gray-950 min-h-screen py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">

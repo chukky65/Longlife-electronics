@@ -219,7 +219,7 @@ export const Profile = () => {
                               <p className="font-bold text-red-600 text-[13px]">₦{order.total.toLocaleString()}</p>
                             </div>
                           </div>
-                          <button onClick={() => navigate('/tracking')} className="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-red-600 transition-colors flex items-center gap-1">
+                          <button onClick={() => navigate(`/tracking?id=${order.id}`)} className="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-red-600 transition-colors flex items-center gap-1">
                             Track Order &rarr;
                           </button>
                         </div>

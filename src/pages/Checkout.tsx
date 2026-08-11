@@ -115,7 +115,7 @@ export const Checkout = () => {
           user_id: user.id,
           total: finalTotal,
           status: 'pending',
-          shipping_address: `${formData.address}, ${formData.city}, ${formData.state}`,
+          shipping_address: `${formData.firstName} ${formData.lastName}\n${formData.address}, ${formData.city}, ${formData.state}\nPhone: ${formData.phone}`,
           payment_method: formData.paymentMethod
         })
         .select()

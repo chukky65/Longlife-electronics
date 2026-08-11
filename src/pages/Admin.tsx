@@ -172,13 +172,7 @@ export const Admin = () => {
     setOrdersLoading(true);
     const { data, error } = await supabase
       .from('orders')
-      .select(`
-        *,
-        profiles (
-          name,
-          phone
-        )
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
       
     if (error) {
