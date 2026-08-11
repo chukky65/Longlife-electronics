@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Truck, Clock, MapPin, ArrowRight } from 'lucide-react';
+import Spline from '@splinetool/react-spline';
 
 export const About = () => {
   return (
@@ -20,12 +21,9 @@ export const About = () => {
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-12 items-center">
-            <div className="lg:w-1/2">
-              <img 
-                src="https://images.unsplash.com/photo-1570126618953-d437176e8c79?auto=format&fit=crop&q=80&w=1200" 
-                alt="Longlife Electronics Store" 
-                className="rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800"
-              />
+            <div className="lg:w-1/2 w-full h-[400px] md:h-[500px] relative rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-lg bg-gray-100 dark:bg-gray-900">
+              <div className="absolute inset-0 pointer-events-none hidden md:block z-10" />
+              <Spline scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" className="w-full h-full" />
             </div>
             <div className="lg:w-1/2 space-y-6">
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Our Story</h2>

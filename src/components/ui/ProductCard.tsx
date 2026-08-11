@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { ShoppingCart, Heart, Star, Scale, MessageCircle, Eye } from 'lucide-react';
 import { Product } from '../../types';
 import { formatCurrency, cn } from '../../utils';
@@ -27,8 +28,37 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     toggleCompare(product);
   };
 
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const mouseXSpring = useSpring(x);
+  const mouseYSpring = useSpring(y);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
   return (
-    <div className="group flex flex-col bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 hover:border-slate-300 dark:hover:border-gray-700 transition-colors h-[280px]">
+    <motion.div 
+      style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="group flex flex-col bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 hover:border-slate-300 dark:hover:border-gray-700 transition-colors h-[280px]"
+    >
       
       {/* Image Area */}
       <div className="relative h-[160px] bg-slate-50 dark:bg-gray-800 p-4 flex items-center justify-center overflow-hidden">
@@ -123,6 +153,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       {showQuickView && (
         <QuickViewModal product={product} onClose={() => setShowQuickView(false)} />
       )}
-    </div>
+    </motion.div>
   );
 };

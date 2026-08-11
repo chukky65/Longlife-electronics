@@ -12,8 +12,8 @@ import { AskTheExpert } from '../components/ui/AskTheExpert';
 import { SEO } from '../components/ui/SEO';
 import { NewsletterModal } from '../components/ui/NewsletterModal';
 import { FloatingWhatsApp } from '../components/layout/FloatingWhatsApp';
-import promoBannerImg from '../assets/promo-banner.png';
-import storeTourImg from '../assets/store-tour.png';
+import promoBannerImg from '../assets/images/promo_appliances_3d.png';
+import storeTourImg from '../assets/images/store_tour_3d.png';
 
 export const Home = () => {
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
