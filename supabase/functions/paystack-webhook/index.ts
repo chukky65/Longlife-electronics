@@ -5,10 +5,23 @@ import crypto from "node:crypto";
 serve(async (req) => {
   try {
     const signature = req.headers.get("x-paystack-signature");
-    const PAYSTACK_SECRET_KEY = Deno.env.get("PAYSTACK_SECRET_KEY");
+    
+    // Connect to Supabase using Service Role (Admin) privileges
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Fetch secret keys from the database (set by admin in dashboard)
+    const { data: settings } = await supabase
+      .from("store_settings")
+      .select("*")
+      .in("id", ["paystack_secret_key", "resend_api_key"]);
+
+    const PAYSTACK_SECRET_KEY = settings?.find(s => s.id === "paystack_secret_key")?.value;
+    const RESEND_API_KEY = settings?.find(s => s.id === "resend_api_key")?.value;
 
     if (!PAYSTACK_SECRET_KEY) {
-      return new Response("Missing Paystack Secret Key", { status: 500 });
+      return new Response("Missing Paystack Secret Key in Database", { status: 500 });
     }
 
     // Read the raw body as text for signature verification
@@ -32,11 +45,6 @@ serve(async (req) => {
       // The reference is our Supabase order.id
       const orderId = reference;
 
-      // Connect to Supabase using Service Role (Admin) privileges
-      const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-      const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
       // 1. Update Order Status
       const { error: updateError } = await supabase
         .from("orders")
@@ -49,7 +57,6 @@ serve(async (req) => {
       }
 
       // 2. Send Email Receipt via Resend
-      const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
       if (RESEND_API_KEY) {
         const totalNaira = amount / 100; // Paystack amount is in kobo
         const email = customer.email;

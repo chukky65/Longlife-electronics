@@ -45,6 +45,8 @@ export const Admin = () => {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
   const [paystackKey, setPaystackKey] = useState('');
+  const [paystackSecretKey, setPaystackSecretKey] = useState('');
+  const [resendApiKey, setResendApiKey] = useState('');
   const [savingSettings, setSavingSettings] = useState(false);
 
   const [promoCodes, setPromoCodes] = useState<any[]>([]);
@@ -95,9 +97,15 @@ export const Admin = () => {
   };
 
   const fetchSettings = async () => {
-    const { data } = await supabase.from('store_settings').select('*').eq('id', 'paystack_public_key').single();
+    const { data } = await supabase.from('store_settings').select('*');
     if (data) {
-      setPaystackKey(data.value || '');
+      const publicK = data.find(s => s.id === 'paystack_public_key');
+      const secretK = data.find(s => s.id === 'paystack_secret_key');
+      const resendK = data.find(s => s.id === 'resend_api_key');
+      
+      if (publicK) setPaystackKey(publicK.value || '');
+      if (secretK) setPaystackSecretKey(secretK.value || '');
+      if (resendK) setResendApiKey(resendK.value || '');
     }
   };
 
@@ -143,10 +151,11 @@ export const Admin = () => {
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingSettings(true);
-    const { error } = await supabase.from('store_settings').upsert({
-      id: 'paystack_public_key',
-      value: paystackKey
-    });
+    const { error } = await supabase.from('store_settings').upsert([
+      { id: 'paystack_public_key', value: paystackKey },
+      { id: 'paystack_secret_key', value: paystackSecretKey },
+      { id: 'resend_api_key', value: resendApiKey }
+    ]);
     if (error) {
       toast(error.message, 'error');
     } else {
@@ -709,12 +718,46 @@ export const Admin = () => {
                     type="text" 
                     value={paystackKey} 
                     onChange={e => setPaystackKey(e.target.value)} 
-                    placeholder="pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    placeholder="pk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxx"
                     className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 rounded focus:outline-none focus:border-red-600 font-mono text-sm"
                   />
                   <p className="mt-2 text-xs text-gray-500">
                     This key will be used to initialize the Paystack popup for online card payments during checkout.
                   </p>
+                </div>
+                
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
+                  <h4 className="font-bold text-gray-900 dark:text-white mb-4 text-sm">Secure Backend Keys</h4>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Paystack Secret Key</label>
+                      <input 
+                        type="password" 
+                        value={paystackSecretKey} 
+                        onChange={e => setPaystackSecretKey(e.target.value)} 
+                        placeholder="Secret Key (sk_test_... or sk_live_...)"
+                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 rounded focus:outline-none focus:border-red-600 font-mono text-sm"
+                      />
+                      <p className="mt-2 text-xs text-gray-500">
+                        Kept secret. Used by the backend to securely verify successful payments.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Resend API Key</label>
+                      <input 
+                        type="password" 
+                        value={resendApiKey} 
+                        onChange={e => setResendApiKey(e.target.value)} 
+                        placeholder="re_xxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 rounded focus:outline-none focus:border-red-600 font-mono text-sm"
+                      />
+                      <p className="mt-2 text-xs text-gray-500">
+                        Used to automatically send email receipts to customers after successful payment.
+                      </p>
+                    </div>
+                  </div>
                 </div>
                 <button 
                   type="submit" 
