@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Users, DollarSign, AlertCircle, ShoppingBag, Truck, LayoutDashboard, Plus, Edit, Trash2, X, Image as ImageIcon, Settings as SettingsIcon, Tag } from 'lucide-react';
+import { Package, Users, DollarSign, AlertCircle, ShoppingBag, Truck, LayoutDashboard, Plus, Edit, Trash2, X, Image as ImageIcon, Settings as SettingsIcon, Tag, Home } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useStore } from '../store';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Product, Category } from '../types';
 
@@ -12,6 +12,7 @@ const CATEGORIES: Category[] = [
 ];
 
 export const Admin = () => {
+  const navigate = useNavigate();
   const { user, authLoading, toast } = useStore();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'orders' | 'settings' | 'promos'>('dashboard');
   
@@ -398,12 +399,49 @@ export const Admin = () => {
               </li>
             </ul>
           </nav>
+          
+          {/* Back to Store Button */}
+          <div className="p-4 border-t border-gray-800">
+            <button 
+              onClick={() => navigate('/')}
+              className="w-full flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-colors tracking-wide text-sm"
+            >
+              <Home size={18} /> Back to Store
+            </button>
+          </div>
         </div>
 
         {/* Main Content */}
         <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white capitalize">{activeTab} Overview</h1>
+            
+            {/* Mobile Back Button */}
+            <button 
+              onClick={() => navigate('/')}
+              className="lg:hidden flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors"
+            >
+              <Home size={16} /> <span className="hidden sm:inline">Back to Store</span>
+            </button>
+          </div>
+          
+          {/* Mobile Tabs Navigation */}
+          <div className="lg:hidden flex overflow-x-auto gap-2 pb-4 mb-6 border-b border-gray-200 dark:border-gray-800 scrollbar-hide">
+            {[
+              { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+              { id: 'orders', icon: ShoppingBag, label: 'Orders' },
+              { id: 'products', icon: Package, label: 'Products' },
+              { id: 'promos', icon: Tag, label: 'Promos' },
+              { id: 'settings', icon: SettingsIcon, label: 'Settings' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold transition-colors ${activeTab === tab.id ? 'bg-red-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}
+              >
+                <tab.icon size={14} /> {tab.label}
+              </button>
+            ))}
           </div>
 
           {activeTab === 'dashboard' && (
