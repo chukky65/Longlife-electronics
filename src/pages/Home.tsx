@@ -10,6 +10,9 @@ import { TestimonialCarousel } from '../components/ui/TestimonialCarousel';
 import { Brands } from '../components/home/Brands';
 import { AskTheExpert } from '../components/ui/AskTheExpert';
 import { SEO } from '../components/ui/SEO';
+import { NewsletterModal } from '../components/ui/NewsletterModal';
+import { FloatingWhatsApp } from '../components/layout/FloatingWhatsApp';
+import promoBannerImg from '../assets/promo-banner.png';
 
 export const Home = () => {
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
@@ -206,8 +209,11 @@ export const Home = () => {
                 Get Directions
               </Link>
             </div>
-            <div className="w-full md:w-1/2 h-64 md:h-full min-h-[300px] bg-[url('https://images.unsplash.com/photo-1558009250-d4d216245a67?auto=format&fit=crop&q=80')] bg-cover bg-center relative">
-              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-red-600 to-transparent mix-blend-multiply"></div>
+            <div 
+              className="w-full md:w-1/2 h-64 md:h-full min-h-[300px] bg-cover bg-center relative"
+              style={{ backgroundImage: `url(${promoBannerImg})` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-red-600 via-transparent to-transparent"></div>
             </div>
           </div>
         </div>
