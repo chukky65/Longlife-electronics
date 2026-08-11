@@ -74,8 +74,12 @@ export const Admin = () => {
 
 const handleBulkImport = async () => {
   try {
-    toast('Starting bulk import...', 'info');
+    toast('Deleting old products...', 'info');
     
+    // Attempt to delete all existing products first
+    await supabase.from('products').delete().neq('price', -1);
+    
+    toast('Starting bulk import...', 'info');
     const { error } = await supabase.from('products').insert(productsToImport);
     if (error) throw error;
     
