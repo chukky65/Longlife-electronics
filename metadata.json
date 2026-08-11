@@ -1,0 +1,8 @@
+{
+  "name": "Longlife Electronics",
+  "description": "Modern ecommerce storefront for Longlife Electronics, based in Asaba, Nigeria.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
