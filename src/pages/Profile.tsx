@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
-import { User, LogOut, Package, MapPin, Settings, History } from 'lucide-react';
+import { User, LogOut, Package, MapPin, Settings, History, LayoutDashboard } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export const Profile = () => {
@@ -150,6 +150,15 @@ export const Profile = () => {
               >
                 <Settings size={16} /> Profile Settings
               </button>
+              
+              {user.role === 'admin' && (
+                <button 
+                  onClick={() => navigate('/admin')}
+                  className="flex items-center gap-3 p-4 text-[11px] font-bold uppercase tracking-widest text-slate-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-slate-800 dark:hover:text-white border-l-4 border-transparent transition-colors mt-2"
+                >
+                  <LayoutDashboard size={16} /> Admin Dashboard
+                </button>
+              )}
               <button 
                 onClick={handleLogout}
                 className="flex items-center gap-3 p-4 text-[11px] font-bold uppercase tracking-widest text-slate-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-500 border-l-4 border-transparent transition-colors mt-auto border-t border-slate-100 dark:border-slate-800"
