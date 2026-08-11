@@ -460,7 +460,10 @@ export const Admin = () => {
           {activeTab === 'dashboard' && (
             <div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center justify-between">
+                <div 
+                  className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center justify-between cursor-pointer hover:border-red-600 transition-colors"
+                  onClick={() => setActiveTab('orders')}
+                >
                   <div>
                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Sales</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">₦{dashboardData.totalSales.toLocaleString()}</p>
@@ -470,7 +473,10 @@ export const Admin = () => {
                   </div>
                 </div>
                 
-                <div className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center justify-between">
+                <div 
+                  className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center justify-between cursor-pointer hover:border-red-600 transition-colors"
+                  onClick={() => setActiveTab('orders')}
+                >
                   <div>
                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Orders</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{dashboardData.totalOrders}</p>
