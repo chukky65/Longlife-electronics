@@ -5,10 +5,12 @@ import { useStore } from '../store';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Product, Category } from '../types';
+import productsToImport from '../importData.json';
 
 const CATEGORIES: Category[] = [
   'Refrigerators', 'LED & Smart TVs', 'Home Theater', 
-  'Air Conditioners', 'Washing Machines', 'Water Dispensers', 'Microwaves', 'Small Appliances'
+  'Air Conditioners', 'Washing Machines', 'Water Dispensers', 'Microwaves', 'Small Appliances',
+  'Generators & Power', 'Furniture', 'Electricals & Cables', 'Fans', 'Accessories'
 ];
 
 export const Admin = () => {
@@ -69,6 +71,20 @@ export const Admin = () => {
       fetchPromos();
     }
   }, [activeTab]);
+
+const handleBulkImport = async () => {
+  try {
+    toast('Starting bulk import...', 'info');
+    
+    const { error } = await supabase.from('products').insert(productsToImport);
+    if (error) throw error;
+    
+    toast('Successfully imported 78 products!', 'success');
+    fetchProducts();
+  } catch (err: any) {
+    toast(err.message || 'Import failed', 'error');
+  }
+};
 
   const fetchDashboardStats = async () => {
     const { data: ordersData } = await supabase.from('orders').select('total, created_at').neq('status', 'cancelled');
@@ -480,8 +496,21 @@ export const Admin = () => {
                   </div>
                 </div>
               </div>
+              
+              <div className="mb-8 p-6 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-xl flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-bold text-red-700 dark:text-red-400">Database Migration Pending</h3>
+                  <p className="text-sm text-red-600 dark:text-red-300">The old dummy products have been cleared. Click here to import the 78 parsed products from your PDF.</p>
+                </div>
+                <button 
+                  onClick={handleBulkImport}
+                  className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors shadow-sm"
+                >
+                  Import 78 Products
+                </button>
+              </div>
 
-              <div className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm mb-8">
+              <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
                 <h3 className="font-bold text-gray-900 dark:text-white mb-6">Revenue Over Time (Last 7 Days)</h3>
                 <div className="h-72">
                   <ResponsiveContainer width="100%" height="100%">

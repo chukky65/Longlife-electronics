@@ -6,7 +6,12 @@ export type Category =
   | 'Washing Machines'
   | 'Water Dispensers'
   | 'Microwaves'
-  | 'Small Appliances';
+  | 'Small Appliances'
+  | 'Generators & Power'
+  | 'Furniture'
+  | 'Electricals & Cables'
+  | 'Fans'
+  | 'Accessories';
 
 export interface Product {
   id: string;
