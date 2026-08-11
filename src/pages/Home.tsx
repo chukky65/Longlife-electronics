@@ -13,6 +13,7 @@ import { SEO } from '../components/ui/SEO';
 import { NewsletterModal } from '../components/ui/NewsletterModal';
 import { FloatingWhatsApp } from '../components/layout/FloatingWhatsApp';
 import promoBannerImg from '../assets/promo-banner.png';
+import storeTourImg from '../assets/store-tour.png';
 
 export const Home = () => {
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
@@ -234,7 +235,7 @@ export const Home = () => {
               </div>
               <p className="font-bold text-xl md:text-2xl tracking-widest uppercase drop-shadow-md">Watch Our Store Tour</p>
             </div>
-            <img src="https://images.unsplash.com/photo-1555664424-778a1e5e1b48?auto=format&fit=crop&q=80&w=1200" alt="Electronics Store Front" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
+            <img src={storeTourImg} alt="Electronics Store Front" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
           </div>
         </div>
       </section>
