@@ -50,7 +50,7 @@ export const Home = () => {
     <div className="w-full">
       <SEO />
       {/* Hero Section */}
-      <section className="bg-slate-900 text-white relative overflow-hidden h-[90vh] md:h-screen min-h-[600px] flex items-center">
+      <section className="bg-slate-900 text-white relative overflow-hidden h-[70vh] md:h-[80vh] min-h-[450px] flex items-center">
         {/* 3D Background */}
         <div className="absolute inset-0 z-0">
           <Spline scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" />
