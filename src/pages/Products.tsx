@@ -43,7 +43,11 @@ export const Products = () => {
       }
       
       if (searchQuery) {
-        query = query.or(`name.ilike.%${searchQuery}%,brand.ilike.%${searchQuery}%,category.ilike.%${searchQuery}%`);
+        // Remove commas from search query because they break Supabase's .or() syntax
+        const safeQuery = searchQuery.replace(/,/g, ' ').trim();
+        if (safeQuery) {
+          query = query.or(`name.ilike.%${safeQuery}%,brand.ilike.%${safeQuery}%,category.ilike.%${safeQuery}%`);
+        }
       }
       
       query = query.gte('price', minPriceParam).lte('price', maxPriceParam);

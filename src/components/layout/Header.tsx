@@ -50,15 +50,15 @@ export const Header = () => {
               <input 
                 type="text" 
                 placeholder="Search for refrigerators, TVs, ACs..." 
-                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full py-2 px-10 text-xs focus:outline-none focus:ring-1 focus:ring-red-500 dark:text-white transition-all"
+                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full py-2.5 pl-10 pr-24 text-xs focus:outline-none focus:ring-1 focus:ring-red-500 dark:text-white transition-all shadow-inner"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <button type="submit" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-600 transition-colors">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                 <Search size={16} />
-              </button>
-              <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-red-600 uppercase tracking-tight">
-                Ask AI Assistant
+              </div>
+              <button type="submit" className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full transition-colors shadow-sm">
+                Search
               </button>
             </form>
           </div>
