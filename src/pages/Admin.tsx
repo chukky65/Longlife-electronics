@@ -47,6 +47,7 @@ export const Admin = () => {
   const [paystackKey, setPaystackKey] = useState('');
   const [paystackSecretKey, setPaystackSecretKey] = useState('');
   const [resendApiKey, setResendApiKey] = useState('');
+  const [analyticsId, setAnalyticsId] = useState('');
   const [savingSettings, setSavingSettings] = useState(false);
 
   const [promoCodes, setPromoCodes] = useState<any[]>([]);
@@ -102,10 +103,12 @@ export const Admin = () => {
       const publicK = data.find(s => s.id === 'paystack_public_key');
       const secretK = data.find(s => s.id === 'paystack_secret_key');
       const resendK = data.find(s => s.id === 'resend_api_key');
+      const analyticsId = data.find(s => s.id === 'analytics_id');
       
       if (publicK) setPaystackKey(publicK.value || '');
       if (secretK) setPaystackSecretKey(secretK.value || '');
       if (resendK) setResendApiKey(resendK.value || '');
+      if (analyticsId) setAnalyticsId(analyticsId.value || '');
     }
   };
 
@@ -154,7 +157,8 @@ export const Admin = () => {
     const { error } = await supabase.from('store_settings').upsert([
       { id: 'paystack_public_key', value: paystackKey },
       { id: 'paystack_secret_key', value: paystackSecretKey },
-      { id: 'resend_api_key', value: resendApiKey }
+      { id: 'resend_api_key', value: resendApiKey },
+      { id: 'analytics_id', value: analyticsId }
     ]);
     if (error) {
       toast(error.message, 'error');
@@ -757,6 +761,24 @@ export const Admin = () => {
                         Used to automatically send email receipts to customers after successful payment.
                       </p>
                     </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
+                  <h4 className="font-bold text-gray-900 dark:text-white mb-4 text-sm">SEO & Analytics</h4>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Google Analytics Tracking ID</label>
+                    <input 
+                      type="text" 
+                      value={analyticsId} 
+                      onChange={e => setAnalyticsId(e.target.value)} 
+                      placeholder="G-XXXXXXXXXX"
+                      className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 rounded focus:outline-none focus:border-red-600 font-mono text-sm"
+                    />
+                    <p className="mt-2 text-xs text-gray-500">
+                      Enter your Google Analytics Measurement ID to track visitors. Leave blank to disable.
+                    </p>
                   </div>
                 </div>
                 <button 

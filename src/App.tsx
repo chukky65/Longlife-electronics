@@ -7,6 +7,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { StoreProvider } from './store';
+import { AnalyticsProvider } from './components/AnalyticsProvider';
 import { Layout } from './components/layout/Layout';
 import { Home } from './pages/Home';
 import { Products } from './pages/Products';
@@ -20,12 +21,16 @@ import { Contact } from './pages/Contact';
 import { OrderTracking } from './pages/OrderTracking';
 import { Admin } from './pages/Admin';
 import { Profile } from './pages/Profile';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { Terms } from './pages/Terms';
+import { RefundPolicy } from './pages/RefundPolicy';
 
 export default function App() {
   return (
     <HelmetProvider>
       <StoreProvider>
-        <BrowserRouter>
+        <AnalyticsProvider>
+          <BrowserRouter>
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
@@ -39,11 +44,15 @@ export default function App() {
               <Route path="about" element={<About />} />
               <Route path="contact" element={<Contact />} />
               <Route path="tracking" element={<OrderTracking />} />
+              <Route path="privacy" element={<PrivacyPolicy />} />
+              <Route path="terms" element={<Terms />} />
+              <Route path="refund" element={<RefundPolicy />} />
             </Route>
             {/* Admin doesn't use the standard storefront layout */}
             <Route path="/admin" element={<Admin />} />
           </Routes>
-        </BrowserRouter>
+          </BrowserRouter>
+        </AnalyticsProvider>
       </StoreProvider>
     </HelmetProvider>
   );

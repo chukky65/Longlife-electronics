@@ -124,9 +124,10 @@ export const Footer = () => {
              <span className="flex items-center gap-1"><CreditCard size={14} /> Mastercard</span>
              <span className="flex items-center gap-1"><CreditCard size={14} /> Verve</span>
           </div>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-white transition-colors">Terms</a>
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
+          <div className="flex flex-wrap gap-4 md:gap-6 justify-center">
+            <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link to="/refund" className="hover:text-white transition-colors">Refund Policy</Link>
           </div>
         </div>
       </div>
