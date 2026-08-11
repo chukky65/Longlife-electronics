@@ -106,36 +106,9 @@ export const Checkout = () => {
         return;
       }
     }
-  };
-
-  const config = {
-    reference: (new Date()).getTime().toString(),
-    email: formData.email,
-    amount: finalTotal * 100, // in kobo
-    publicKey: paystackKey,
-  };
-
-  const initializePayment = usePaystackPayment(config);
-
-  React.useEffect(() => {
-    if (loading && formData.paymentMethod === 'card' && paystackKey) {
-      initializePayment({
-        onSuccess: async (reference: any) => {
-          await processOrder(`card (${reference.reference})`, 'processing');
-        },
-        onClose: () => {
-          setLoading(false);
-          toast('Payment window closed.', 'error');
-        }
-      });
-    } else if (loading && formData.paymentMethod !== 'card') {
-      processOrder(formData.paymentMethod, 'pending');
-    }
-  }, [loading]);
-
-  const processOrder = async (method: string, status: string) => {
+    
+    // Create the order FIRST, before any payment processing
     try {
-      // 1. Create Order
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -150,7 +123,6 @@ export const Checkout = () => {
 
       if (orderError) throw orderError;
 
-      // 2. Create Order Items
       const orderItems = cart.map(item => ({
         order_id: orderData.id,
         product_id: item.product.id,
@@ -164,31 +136,56 @@ export const Checkout = () => {
 
       if (itemsError) throw itemsError;
 
-      // 3. Send Email Receipt
-      try {
-        await supabase.functions.invoke('send-receipt', {
-          body: {
-            orderId: orderData.id,
-            email: formData.email,
-            name: formData.firstName,
-            total: finalTotal
-          }
-        });
-      } catch (err) {
-        console.error('Failed to send email receipt:', err);
-        // We don't throw here so the user still sees a success message for the order
+      // If Cash on Delivery, we are done
+      if (formData.paymentMethod !== 'card') {
+        handleSuccess();
+        return;
       }
 
-      setIsSuccess(true);
-      clearCart();
-      
-      setTimeout(() => {
-        navigate('/profile'); // Redirect to profile to see order history
-      }, 4000);
+      // If Card, trigger Paystack with the new order ID as reference
+      setPaystackConfig({
+        reference: orderData.id, // Use actual order ID as reference!
+        email: formData.email,
+        amount: finalTotal * 100, // in kobo
+        publicKey: paystackKey,
+      });
+
     } catch (error: any) {
       toast(error.message, 'error');
       setLoading(false);
     }
+  };
+
+  const [paystackConfig, setPaystackConfig] = useState<any>(null);
+  
+  // Provide a dummy config if not ready to prevent hook errors
+  const initializePayment = usePaystackPayment(paystackConfig || { publicKey: paystackKey || 'dummy' });
+
+  React.useEffect(() => {
+    if (paystackConfig && loading) {
+      initializePayment({
+        onSuccess: () => {
+          // Webhook will handle the status update and email. Just show success.
+          handleSuccess();
+        },
+        onClose: () => {
+          setLoading(false);
+          setPaystackConfig(null);
+          toast('Payment window closed. You can complete your order later in your profile.', 'error');
+        }
+      });
+    }
+  }, [paystackConfig]);
+
+  const handleSuccess = () => {
+    setIsSuccess(true);
+    clearCart();
+    setLoading(false);
+    setPaystackConfig(null);
+    
+    setTimeout(() => {
+      navigate('/profile'); // Redirect to profile to see order history
+    }, 4000);
   };
 
   if (isSuccess) {
