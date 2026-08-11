@@ -52,7 +52,8 @@ export const Home = () => {
       {/* Hero Section */}
       <section className="bg-slate-900 text-white relative overflow-hidden h-[70vh] md:h-[80vh] min-h-[450px] flex items-center">
         {/* 3D Background */}
-        <div className="absolute inset-0 z-0">
+        {/* On mobile, we disable pointer events so the user can easily scroll past the 3D model without getting stuck */}
+        <div className="absolute inset-0 z-0 pointer-events-none lg:pointer-events-auto">
           <Spline scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" />
         </div>
         
@@ -64,12 +65,12 @@ export const Home = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="max-w-2xl pointer-events-auto"
+            className="max-w-2xl pointer-events-auto mt-10 md:mt-0"
           >
-            <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-4 uppercase leading-none">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter mb-4 uppercase leading-none">
               Plug Into The Future With <span className="text-red-500">Longlife</span>
             </h1>
-            <p className="text-base md:text-lg text-slate-300 mb-8 leading-relaxed max-w-xl">
+            <p className="text-base sm:text-lg text-slate-300 mb-8 leading-relaxed max-w-xl">
               Experience the next generation of home appliances and premium electronics in Asaba. Drag the 3D model to interact!
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
