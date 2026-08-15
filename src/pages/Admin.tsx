@@ -11,7 +11,7 @@ import productsToImport from '../importData.json';
 export const Admin = () => {
   const navigate = useNavigate();
   const { user, authLoading, toast } = useStore();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'orders' | 'settings' | 'promos'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'orders' | 'users' | 'settings' | 'promos'>('dashboard');
   
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
@@ -50,6 +50,10 @@ export const Admin = () => {
   const [promoLoading, setPromoLoading] = useState(false);
   const [promoForm, setPromoForm] = useState({ code: '', discount_percent: '', discount_amount: '' });
 
+  const [profiles, setProfiles] = useState<any[]>([]);
+  const [profilesLoading, setProfilesLoading] = useState(false);
+  const [updatingProfileId, setUpdatingProfileId] = useState<string | null>(null);
+
   const [dashboardData, setDashboardData] = useState({ totalSales: 0, totalOrders: 0, chartData: [] as any[] });
 
   useEffect(() => {
@@ -63,6 +67,8 @@ export const Admin = () => {
       fetchOrders();
     } else if (activeTab === 'promos') {
       fetchPromos();
+    } else if (activeTab === 'users') {
+      fetchProfiles();
     }
   }, [activeTab]);
 
@@ -122,6 +128,41 @@ const handleBulkImport = async () => {
     const { data, error } = await supabase.from('promo_codes').select('*').order('created_at', { ascending: false });
     if (data) setPromoCodes(data);
     setPromoLoading(false);
+  };
+
+  const fetchProfiles = async () => {
+    setProfilesLoading(true);
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, email, name, phone, role, created_at')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      toast(error.message, 'error');
+    } else {
+      setProfiles(data || []);
+    }
+    setProfilesLoading(false);
+  };
+
+  const handleRoleChange = async (profile: any, role: 'user' | 'admin') => {
+    const action = role === 'admin' ? 'give this account administrator access' : 'remove administrator access from this account';
+    if (!window.confirm(`Are you sure you want to ${action}?`)) return;
+
+    setUpdatingProfileId(profile.id);
+    const { error } = await supabase.rpc('set_profile_role', {
+      p_profile_id: profile.id,
+      p_role: role,
+    });
+
+    if (error) {
+      toast(error.message, 'error');
+    } else {
+      toast(role === 'admin' ? 'Administrator access granted.' : 'Administrator access removed.');
+      await fetchProfiles();
+      if (profile.id === user?.id && role === 'user') navigate('/');
+    }
+    setUpdatingProfileId(null);
   };
 
   const handleCreatePromo = async (e: React.FormEvent) => {
@@ -442,6 +483,14 @@ const handleBulkImport = async () => {
                 </button>
               </li>
               <li>
+                <button
+                  onClick={() => setActiveTab('users')}
+                  className={`w-full flex items-center gap-3 px-6 py-3 font-medium transition-colors ${activeTab === 'users' ? 'bg-red-600 text-white' : 'hover:bg-gray-800 hover:text-white'}`}
+                >
+                  <Users size={20} /> Users
+                </button>
+              </li>
+              <li>
                 <button 
                   onClick={() => setActiveTab('settings')}
                   className={`w-full flex items-center gap-3 px-6 py-3 font-medium transition-colors ${activeTab === 'settings' ? 'bg-red-600 text-white' : 'hover:bg-gray-800 hover:text-white'}`}
@@ -484,6 +533,7 @@ const handleBulkImport = async () => {
               { id: 'orders', icon: ShoppingBag, label: 'Orders' },
               { id: 'products', icon: Package, label: 'Products' },
               { id: 'promos', icon: Tag, label: 'Promos' },
+              { id: 'users', icon: Users, label: 'Users' },
               { id: 'settings', icon: SettingsIcon, label: 'Settings' }
             ].map((tab) => (
               <button
@@ -766,6 +816,57 @@ const handleBulkImport = async () => {
                     </tbody>
                   </table>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'users' && (
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+                <h3 className="font-bold text-gray-900 dark:text-white">Customer and Administrator Accounts</h3>
+                <p className="mt-1 text-sm text-gray-500">Promote the client's registered account before removing your own administrator access.</p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">
+                      <th className="px-6 py-3 font-medium">Account</th>
+                      <th className="px-6 py-3 font-medium">Phone</th>
+                      <th className="px-6 py-3 font-medium">Role</th>
+                      <th className="px-6 py-3 font-medium text-right">Access</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-sm">
+                    {profilesLoading && profiles.length === 0 ? (
+                      <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">Loading accounts...</td></tr>
+                    ) : profiles.length === 0 ? (
+                      <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">No registered accounts found.</td></tr>
+                    ) : profiles.map((profile) => (
+                      <tr key={profile.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                        <td className="px-6 py-4">
+                          <p className="font-bold text-gray-900 dark:text-white">{profile.name || 'Unnamed account'}</p>
+                          <p className="text-xs text-gray-500">{profile.email || 'Email unavailable'}</p>
+                        </td>
+                        <td className="px-6 py-4 text-gray-600 dark:text-gray-300">{profile.phone || 'Not provided'}</td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${profile.role === 'admin' ? 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'}`}>
+                            {profile.role === 'admin' ? 'Administrator' : 'Customer'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button
+                            type="button"
+                            disabled={updatingProfileId === profile.id}
+                            onClick={() => handleRoleChange(profile, profile.role === 'admin' ? 'user' : 'admin')}
+                            className={`rounded px-3 py-2 text-xs font-bold disabled:opacity-50 ${profile.role === 'admin' ? 'border border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800' : 'bg-red-600 text-white hover:bg-red-700'}`}
+                          >
+                            {updatingProfileId === profile.id ? 'Updating...' : profile.role === 'admin' ? 'Make Customer' : 'Make Admin'}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}

@@ -262,6 +262,7 @@ export const Profile = () => {
           if (data.user) {
             await supabase.from('profiles').upsert({
               id: data.user.id,
+              email,
               name: fullName,
               phone: '',
               role: 'user',
