@@ -32,12 +32,14 @@ const emptyAddressForm = {
 };
 
 export const Profile = () => {
-  const { user, logout, toast, authLoading } = useStore();
+  const { user, logout, toast, authLoading, passwordRecovery, clearPasswordRecovery } = useStore();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'orders' | 'addresses' | 'settings'>('orders');
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [recoveryPassword, setRecoveryPassword] = useState('');
+  const [recoveryPasswordConfirmation, setRecoveryPasswordConfirmation] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
@@ -236,7 +238,85 @@ export const Profile = () => {
     return <div className="min-h-[70vh] flex items-center justify-center font-bold text-slate-500 uppercase tracking-widest">Loading...</div>;
   }
 
+  if (user && passwordRecovery) {
+    const handleRecoverySubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (recoveryPassword !== recoveryPasswordConfirmation) {
+        toast('The passwords do not match.', 'error');
+        return;
+      }
+
+      setLoading(true);
+      const { error } = await supabase.auth.updateUser({ password: recoveryPassword });
+      setLoading(false);
+
+      if (error) {
+        toast(error.message, 'error');
+        return;
+      }
+
+      setRecoveryPassword('');
+      setRecoveryPasswordConfirmation('');
+      clearPasswordRecovery();
+      toast('Your password has been updated.');
+    };
+
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center bg-slate-50 dark:bg-gray-950 p-4">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 w-full max-w-md shadow-sm">
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter text-center mb-2">Choose a New Password</h2>
+          <p className="text-sm text-slate-500 text-center mb-6">Use at least 8 characters with uppercase, lowercase, and a number.</p>
+          <form className="space-y-4" onSubmit={handleRecoverySubmit}>
+            <input
+              aria-label="New password"
+              type="password"
+              value={recoveryPassword}
+              onChange={(e) => setRecoveryPassword(e.target.value)}
+              required
+              minLength={8}
+              pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}"
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 text-slate-900 dark:text-white focus:outline-none focus:border-red-600"
+              placeholder="New password"
+            />
+            <input
+              aria-label="Confirm new password"
+              type="password"
+              value={recoveryPasswordConfirmation}
+              onChange={(e) => setRecoveryPasswordConfirmation(e.target.value)}
+              required
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 text-slate-900 dark:text-white focus:outline-none focus:border-red-600"
+              placeholder="Confirm new password"
+            />
+            <button type="submit" disabled={loading} className="w-full bg-red-600 text-white font-bold py-3 text-[11px] uppercase tracking-widest hover:bg-red-700 disabled:opacity-50">
+              {loading ? 'Updating...' : 'Update Password'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   if (!user) {
+    const handlePasswordResetRequest = async () => {
+      if (!email.trim()) {
+        toast('Enter your email address first.', 'error');
+        return;
+      }
+
+      setLoading(true);
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/profile`,
+      });
+      setLoading(false);
+
+      if (error) {
+        toast(error.message, 'error');
+        return;
+      }
+
+      toast('If that email is registered, a password reset link has been sent.', 'info');
+    };
+
     const handleAuth = async (e: React.FormEvent) => {
       e.preventDefault();
       setLoading(true);
@@ -318,6 +398,11 @@ export const Profile = () => {
             <button type="submit" disabled={loading} className="w-full bg-red-600 text-white font-bold py-3 text-[11px] uppercase tracking-widest hover:bg-red-700 transition-colors disabled:opacity-50">
               {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Register'}
             </button>
+            {isLogin && (
+              <button type="button" onClick={handlePasswordResetRequest} disabled={loading} className="w-full text-[11px] font-bold uppercase tracking-widest text-slate-500 hover:text-red-600 disabled:opacity-50">
+                Forgot password?
+              </button>
+            )}
           </form>
           <div className="mt-6 text-center text-[11px] text-slate-500 font-bold uppercase tracking-widest">
             {isLogin ? "Don't have an account? " : 'Already have an account? '}

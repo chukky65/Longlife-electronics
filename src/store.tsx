@@ -35,6 +35,8 @@ export interface StoreContextType {
   login: (user: User) => void;
   logout: () => Promise<void>;
   authLoading: boolean;
+  passwordRecovery: boolean;
+  clearPasswordRecovery: () => void;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -62,6 +64,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [passwordRecovery, setPasswordRecovery] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   // Sync state to local storage (always do this as a fallback)
@@ -172,7 +175,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setPasswordRecovery(true);
+      }
       if (session?.user) {
         fetchProfile(session.user.id, session.user.email || '');
       } else {
@@ -194,8 +200,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const logout = async () => {
     await supabase.auth.signOut();
     setUser(null);
+    setPasswordRecovery(false);
     toast('Logged out successfully!', 'info');
   };
+
+  const clearPasswordRecovery = () => setPasswordRecovery(false);
 
   const toast = useCallback((message: string, type: ToastType = 'success') => {
     const id = Math.random().toString(36).substr(2, 9);
@@ -335,7 +344,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   return (
     <StoreContext.Provider value={{
       cart, wishlist, compareList, addToCart, removeFromCart, updateCartQuantity, clearCart,
-      toggleWishlist, isInWishlist, toggleCompare, removeFromCompare, isInCompare, clearCompare, theme, toggleTheme, cartTotal, cartCount, toast, user, login, logout, authLoading
+      toggleWishlist, isInWishlist, toggleCompare, removeFromCompare, isInCompare, clearCompare, theme, toggleTheme, cartTotal, cartCount, toast, user, login, logout, authLoading, passwordRecovery, clearPasswordRecovery
     }}>
       {children}
       {/* Toast Container */}
