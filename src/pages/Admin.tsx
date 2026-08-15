@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Users, DollarSign, AlertCircle, ShoppingBag, Truck, LayoutDashboard, Plus, Edit, Trash2, X, Image as ImageIcon, Settings as SettingsIcon, Tag, Home } from 'lucide-react';
+import { Package, Users, DollarSign, AlertCircle, ShoppingBag, Truck, LayoutDashboard, Plus, Edit, Trash2, X, Image as ImageIcon, Settings as SettingsIcon, Tag, Home, Mail } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useStore } from '../store';
 import { Navigate, useNavigate } from 'react-router-dom';
@@ -11,7 +11,7 @@ import productsToImport from '../importData.json';
 export const Admin = () => {
   const navigate = useNavigate();
   const { user, authLoading, toast } = useStore();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'orders' | 'users' | 'settings' | 'promos'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'orders' | 'users' | 'messages' | 'settings' | 'promos'>('dashboard');
   
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
@@ -54,6 +54,10 @@ export const Admin = () => {
   const [profilesLoading, setProfilesLoading] = useState(false);
   const [updatingProfileId, setUpdatingProfileId] = useState<string | null>(null);
 
+  const [inquiries, setInquiries] = useState<any[]>([]);
+  const [newsletterSubscriptions, setNewsletterSubscriptions] = useState<any[]>([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
+
   const [dashboardData, setDashboardData] = useState({ totalSales: 0, totalOrders: 0, chartData: [] as any[] });
 
   useEffect(() => {
@@ -69,6 +73,8 @@ export const Admin = () => {
       fetchPromos();
     } else if (activeTab === 'users') {
       fetchProfiles();
+    } else if (activeTab === 'messages') {
+      fetchMessages();
     }
   }, [activeTab]);
 
@@ -163,6 +169,32 @@ const handleBulkImport = async () => {
       if (profile.id === user?.id && role === 'user') navigate('/');
     }
     setUpdatingProfileId(null);
+  };
+
+  const fetchMessages = async () => {
+    setMessagesLoading(true);
+    const [inquiryResult, newsletterResult] = await Promise.all([
+      supabase.from('inquiries').select('*').order('created_at', { ascending: false }),
+      supabase.from('newsletter_subscriptions').select('*').order('created_at', { ascending: false }),
+    ]);
+
+    if (inquiryResult.error || newsletterResult.error) {
+      toast(inquiryResult.error?.message || newsletterResult.error?.message || 'Unable to load customer messages.', 'error');
+    } else {
+      setInquiries(inquiryResult.data || []);
+      setNewsletterSubscriptions(newsletterResult.data || []);
+    }
+    setMessagesLoading(false);
+  };
+
+  const handleInquiryStatus = async (inquiryId: string, status: 'new' | 'read' | 'resolved') => {
+    const { error } = await supabase.from('inquiries').update({ status }).eq('id', inquiryId);
+    if (error) {
+      toast(error.message, 'error');
+    } else {
+      setInquiries((current) => current.map((inquiry) => inquiry.id === inquiryId ? { ...inquiry, status } : inquiry));
+      toast('Message status updated.');
+    }
   };
 
   const handleCreatePromo = async (e: React.FormEvent) => {
@@ -491,6 +523,14 @@ const handleBulkImport = async () => {
                 </button>
               </li>
               <li>
+                <button
+                  onClick={() => setActiveTab('messages')}
+                  className={`w-full flex items-center gap-3 px-6 py-3 font-medium transition-colors ${activeTab === 'messages' ? 'bg-red-600 text-white' : 'hover:bg-gray-800 hover:text-white'}`}
+                >
+                  <Mail size={20} /> Messages
+                </button>
+              </li>
+              <li>
                 <button 
                   onClick={() => setActiveTab('settings')}
                   className={`w-full flex items-center gap-3 px-6 py-3 font-medium transition-colors ${activeTab === 'settings' ? 'bg-red-600 text-white' : 'hover:bg-gray-800 hover:text-white'}`}
@@ -534,6 +574,7 @@ const handleBulkImport = async () => {
               { id: 'products', icon: Package, label: 'Products' },
               { id: 'promos', icon: Tag, label: 'Promos' },
               { id: 'users', icon: Users, label: 'Users' },
+              { id: 'messages', icon: Mail, label: 'Messages' },
               { id: 'settings', icon: SettingsIcon, label: 'Settings' }
             ].map((tab) => (
               <button
@@ -867,6 +908,63 @@ const handleBulkImport = async () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'messages' && (
+            <div className="space-y-6">
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+                  <h3 className="font-bold text-gray-900 dark:text-white">Contact Messages</h3>
+                  <p className="mt-1 text-sm text-gray-500">Messages submitted through the storefront contact form.</p>
+                </div>
+                <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                  {messagesLoading && inquiries.length === 0 ? (
+                    <p className="px-6 py-8 text-center text-gray-500">Loading messages...</p>
+                  ) : inquiries.length === 0 ? (
+                    <p className="px-6 py-8 text-center text-gray-500">No contact messages yet.</p>
+                  ) : inquiries.map((inquiry) => (
+                    <article key={inquiry.id} className="p-6">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="font-bold text-gray-900 dark:text-white">{inquiry.name}</h4>
+                            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${inquiry.status === 'new' ? 'bg-red-100 text-red-700' : inquiry.status === 'resolved' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>{inquiry.status}</span>
+                          </div>
+                          <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                            <a href={`mailto:${inquiry.email}`} className="hover:text-red-600">{inquiry.email}</a>
+                            {inquiry.phone && <a href={`tel:${inquiry.phone}`} className="hover:text-red-600">{inquiry.phone}</a>}
+                            <span>{new Date(inquiry.created_at).toLocaleString()}</span>
+                          </div>
+                        </div>
+                        <select value={inquiry.status} onChange={(e) => handleInquiryStatus(inquiry.id, e.target.value as 'new' | 'read' | 'resolved')} className="rounded border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-bold dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                          <option value="new">New</option>
+                          <option value="read">Read</option>
+                          <option value="resolved">Resolved</option>
+                        </select>
+                      </div>
+                      <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-gray-700 dark:text-gray-300">{inquiry.message}</p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+                  <h3 className="font-bold text-gray-900 dark:text-white">Newsletter Subscribers</h3>
+                  <p className="mt-1 text-sm text-gray-500">{newsletterSubscriptions.filter((subscriber) => subscriber.is_active).length} active subscribers</p>
+                </div>
+                <div className="grid gap-3 p-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {newsletterSubscriptions.length === 0 ? (
+                    <p className="text-sm text-gray-500">No newsletter subscribers yet.</p>
+                  ) : newsletterSubscriptions.map((subscriber) => (
+                    <div key={subscriber.id} className="rounded-lg border border-gray-200 p-3 dark:border-gray-800">
+                      <a href={`mailto:${subscriber.email}`} className="break-all text-sm font-bold text-gray-900 hover:text-red-600 dark:text-white">{subscriber.email}</a>
+                      <p className="mt-1 text-xs text-gray-500">{subscriber.is_active ? 'Active' : 'Unsubscribed'} - {new Date(subscriber.created_at).toLocaleDateString()}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}

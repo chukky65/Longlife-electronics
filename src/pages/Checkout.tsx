@@ -360,12 +360,17 @@ export const Checkout = () => {
                   <input type="radio" name="paymentMethod" value="bank_transfer" checked={formData.paymentMethod === 'bank_transfer'} onChange={handleChange} className="w-4 h-4 text-red-600 focus:ring-red-500" />
                   <span className="ml-3 font-medium text-gray-900 dark:text-white">Bank Transfer</span>
                 </label>
-                <label className="flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                  <input type="radio" name="paymentMethod" value="card" checked={formData.paymentMethod === 'card'} onChange={handleChange} className="w-4 h-4 text-red-600 focus:ring-red-500" />
-                  <span className="ml-3 font-medium text-gray-900 dark:text-white">Online Card Payment</span>
+                <label className={`flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors ${paystackKey ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800' : 'cursor-not-allowed opacity-60'}`}>
+                  <input type="radio" name="paymentMethod" value="card" checked={formData.paymentMethod === 'card'} onChange={handleChange} disabled={!paystackKey} className="w-4 h-4 text-red-600 focus:ring-red-500 disabled:cursor-not-allowed" />
+                  <span className="ml-3 font-medium text-gray-900 dark:text-white">Online Card Payment{!paystackKey ? ' (Not configured)' : ''}</span>
                 </label>
               </div>
-              {formData.paymentMethod === 'card' && (
+              {!paystackKey && (
+                <p className="mt-4 text-sm text-amber-700 dark:text-amber-300">
+                  Please choose Pay on Delivery or Bank Transfer. Online card payment will appear once the store connects Paystack.
+                </p>
+              )}
+              {paystackKey && formData.paymentMethod === 'card' && (
                 <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
                   Card orders are reserved immediately and stay in your account as pending until payment is completed.
                 </p>
