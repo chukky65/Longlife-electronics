@@ -12,7 +12,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { addToCart, toggleWishlist, isInWishlist, toggleCompare, isInCompare, compareList } = useStore();
+  const { addToCart, toggleWishlist, isInWishlist, toggleCompare, isInCompare, compareList, toast } = useStore();
   const [showQuickView, setShowQuickView] = useState(false);
   const isWishlisted = isInWishlist(product.id);
   const isCompared = isInCompare(product.id);
@@ -22,7 +22,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const handleCompareClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!isCompared && compareList.length >= 3) {
-      alert("You can only compare up to 3 products at a time.");
+      toast('You can only compare up to 3 products at a time.', 'error');
       return;
     }
     toggleCompare(product);

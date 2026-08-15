@@ -4,8 +4,23 @@ import { Helmet } from 'react-helmet-async';
 
 export const AnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [analyticsId, setAnalyticsId] = useState<string | null>(null);
+  const [hasConsent, setHasConsent] = useState(() => localStorage.getItem('longlife_cookie_consent') === 'true');
 
   useEffect(() => {
+    const handleConsent = (event: Event) => {
+      setHasConsent(Boolean((event as CustomEvent<boolean>).detail));
+    };
+
+    window.addEventListener('longlife:cookie-consent', handleConsent);
+    return () => window.removeEventListener('longlife:cookie-consent', handleConsent);
+  }, []);
+
+  useEffect(() => {
+    if (!hasConsent) {
+      setAnalyticsId(null);
+      return;
+    }
+
     const fetchAnalyticsId = async () => {
       const { data } = await supabase
         .from('store_settings')
@@ -13,13 +28,13 @@ export const AnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         .eq('id', 'analytics_id')
         .single();
       
-      if (data && data.value) {
+      if (data?.value && /^G-[A-Z0-9]+$/i.test(data.value)) {
         setAnalyticsId(data.value);
       }
     };
 
     fetchAnalyticsId();
-  }, []);
+  }, [hasConsent]);
 
   return (
     <>

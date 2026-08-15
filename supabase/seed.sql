@@ -1,0 +1,2 @@
+-- Production data is managed through the admin dashboard. This file intentionally
+-- remains data-free so local database resets are deterministic and safe.

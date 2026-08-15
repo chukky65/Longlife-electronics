@@ -5,7 +5,6 @@ import { Product } from '../types';
 import { useStore } from '../store';
 import { formatCurrency } from '../utils';
 import { ShoppingCart, Heart, Star, Share2, ShieldCheck, Truck, ArrowLeft, MessageCircle, Scale } from 'lucide-react';
-import { AskTheExpert } from '../components/ui/AskTheExpert';
 import { ProductCard } from '../components/ui/ProductCard';
 import { ProductReviews } from '../components/ui/ProductReviews';
 import { SEO } from '../components/ui/SEO';
@@ -16,7 +15,7 @@ export const ProductDetails = () => {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const { addToCart, toggleWishlist, isInWishlist, toggleCompare, isInCompare, compareList } = useStore();
+  const { addToCart, toggleWishlist, isInWishlist, toggleCompare, isInCompare, compareList, toast } = useStore();
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
@@ -216,7 +215,7 @@ export const ProductDetails = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       if (!isInCompare(product.id) && compareList.length >= 3) {
-                        alert("You can only compare up to 3 products at a time.");
+                        toast('You can only compare up to 3 products at a time.', 'error');
                         return;
                       }
                       toggleCompare(product);
@@ -272,8 +271,6 @@ export const ProductDetails = () => {
         </div>
 
         <ProductReviews productId={product.id} rating={product.rating} reviewsCount={product.reviewsCount} />
-
-        <AskTheExpert productId={product.id} productName={product.name} />
 
         {/* Related Products */}
         <div className="mt-16">

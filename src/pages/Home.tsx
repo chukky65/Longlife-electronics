@@ -1,23 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import Spline from '@splinetool/react-spline';
 import { ShieldCheck, Truck, Clock, ThumbsUp, ArrowRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Product } from '../types';
 import { ProductCard } from '../components/ui/ProductCard';
 import { TestimonialCarousel } from '../components/ui/TestimonialCarousel';
 import { Brands } from '../components/home/Brands';
-import { AskTheExpert } from '../components/ui/AskTheExpert';
 import { SEO } from '../components/ui/SEO';
-import { NewsletterModal } from '../components/ui/NewsletterModal';
-import { FloatingWhatsApp } from '../components/layout/FloatingWhatsApp';
 import promoBannerImg from '../assets/images/promo_appliances_3d.png';
 import storeTourImg from '../assets/store-tour.png';
+
+const Spline = lazy(() => import('@splinetool/react-spline'));
 
 export const Home = () => {
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showSpline, setShowSpline] = useState(false);
+
+  useEffect(() => {
+    const supportsInteractiveHero = window.matchMedia('(min-width: 1024px)').matches
+      && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!supportsInteractiveHero) return;
+
+    const timer = window.setTimeout(() => setShowSpline(true), 1200);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -54,7 +62,12 @@ export const Home = () => {
         {/* 3D Background */}
         {/* On mobile, we disable pointer events so the user can easily scroll past the 3D model without getting stuck */}
         <div className="absolute inset-0 z-0 pointer-events-none lg:pointer-events-auto">
-          <Spline scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(239,68,68,0.3),_transparent_55%)]" />
+          {showSpline && (
+            <Suspense fallback={null}>
+              <Spline scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" />
+            </Suspense>
+          )}
         </div>
         
         <div className="absolute inset-0 z-10 bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent pointer-events-none"></div>
@@ -113,6 +126,8 @@ export const Home = () => {
           </div>
         </div>
       </section>
+
+      <Brands />
 
       {/* Shop by Category */}
       <section className="py-12 bg-white dark:bg-slate-900">

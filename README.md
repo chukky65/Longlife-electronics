@@ -1,23 +1,24 @@
 # Longlife Electronics
 
-A premium e-commerce platform for Longlife Electronics, built with React, Vite, and Supabase.
+A production-oriented e-commerce platform for Longlife Electronics, built with React, Vite, Supabase, Paystack, and Resend.
 
 ## Features
-- **3D Interactive Hero**: Built with Spline.
-- **Dynamic Routing**: Client-side routing with React Router.
-- **Product Catalog**: Fetching live products with filtering and pagination.
-- **Admin Dashboard**: Full CRUD access for products, promo codes, and order management.
-- **Cart & Checkout**: Complete checkout flow.
+- Authenticated customer accounts, synced carts, wishlists, and saved addresses
+- Product catalog, search/filtering, stock control, reviews, and promo codes
+- Server-authoritative checkout with Paystack verification and webhook handling
+- Order history, payment retry, order tracking, and receipt email delivery
+- Role-protected admin dashboard for catalog, promotions, settings, and fulfilment
+- Row-level security, atomic inventory reservation/restoration, and route-level code splitting
 
 ## Getting Started
 
 1. Install dependencies:
    ```bash
-   npm install --legacy-peer-deps
+   npm install
    ```
 
 2. Configure Environment:
-   Create a `.env.local` file with your Supabase keys:
+   Create a `.env.local` file using `.env.example`:
    ```
    VITE_SUPABASE_URL=YOUR_URL
    VITE_SUPABASE_ANON_KEY=YOUR_KEY
@@ -27,3 +28,11 @@ A premium e-commerce platform for Longlife Electronics, built with React, Vite, 
    ```bash
    npm run dev
    ```
+
+4. Run the complete release gate:
+
+   ```bash
+   npm run check
+   ```
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for the database, Edge Function, Paystack, email, hosting, and go-live procedure.

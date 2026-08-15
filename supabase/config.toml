@@ -179,10 +179,10 @@ enable_anonymous_sign_ins = false
 # Allow/disallow testing manual linking of accounts
 enable_manual_linking = false
 # Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.
-minimum_password_length = 6
+minimum_password_length = 8
 # Passwords that do not meet the following requirements will be rejected as weak. Supported values
 # are: `letters_digits`, `lower_upper_letters_digits`, `lower_upper_letters_digits_symbols`
-password_requirements = ""
+password_requirements = "lower_upper_letters_digits"
 
 # Configure passkey sign-ins.
 # [auth.passkey]
@@ -225,7 +225,7 @@ double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
 enable_confirmations = false
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
-secure_password_change = false
+secure_password_change = true
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
 max_frequency = "1s"
 # Number of characters used in the email OTP.
@@ -415,7 +415,7 @@ enabled = true
 
 [functions.send-receipt]
 enabled = true
-verify_jwt = false
+verify_jwt = true
 import_map = "./functions/send-receipt/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -423,3 +423,38 @@ entrypoint = "./functions/send-receipt/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/send-receipt/*.html" ]
+
+[functions.create-order]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/create-order/index.ts"
+
+[functions.verify-payment]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/verify-payment/index.ts"
+
+[functions.manage-order]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/manage-order/index.ts"
+
+[functions.validate-promo]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/validate-promo/index.ts"
+
+[functions.submit-inquiry]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/submit-inquiry/index.ts"
+
+[functions.subscribe-newsletter]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/subscribe-newsletter/index.ts"
+
+[functions.paystack-webhook]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/paystack-webhook/index.ts"

@@ -1,15 +1,40 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useStore } from '../store';
-import { formatCurrency } from '../utils';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { CheckCircle2, UserCircle } from 'lucide-react';
-import { supabase } from '../lib/supabase';
 import { usePaystackPayment } from 'react-paystack';
+import { useStore } from '../store';
+import { supabase } from '../lib/supabase';
+import { getDefaultAddress } from '../lib/customerStorage';
+import { formatCurrency } from '../utils';
+
+type PaymentMethod = 'pay_on_delivery' | 'bank_transfer' | 'card';
+
+interface PaystackConfig {
+  reference: string;
+  email: string;
+  amount: number;
+  publicKey: string;
+  metadata: {
+    custom_fields: Array<{
+      display_name: string;
+      variable_name: string;
+      value: string;
+    }>;
+  };
+}
 
 export const Checkout = () => {
   const { cart, cartTotal, clearCart, toast, user } = useStore();
   const navigate = useNavigate();
   const [isSuccess, setIsSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('Your order has been placed successfully.');
+  const [loading, setLoading] = useState(false);
+  const [paystackKey, setPaystackKey] = useState('');
+  const [paystackConfig, setPaystackConfig] = useState<PaystackConfig | null>(null);
+  const [promoCodeInput, setPromoCodeInput] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<any>(null);
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -18,13 +43,9 @@ export const Checkout = () => {
     address: '',
     city: 'Asaba',
     state: 'Delta',
-    paymentMethod: 'pay_on_delivery'
+    paymentMethod: 'pay_on_delivery' as PaymentMethod,
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [paystackKey, setPaystackKey] = useState('');
-  const [promoCodeInput, setPromoCodeInput] = useState('');
-  const [appliedPromo, setAppliedPromo] = useState<any>(null);
-  const [promoLoading, setPromoLoading] = useState(false);
+  const paymentOpenedRef = useRef(false);
 
   let discountAmount = 0;
   if (appliedPromo) {
@@ -36,18 +57,61 @@ export const Checkout = () => {
   }
   const finalTotal = Math.max(0, cartTotal - discountAmount);
 
-  React.useEffect(() => {
-    const fetchKey = async () => {
-      const { data } = await supabase.from('store_settings').select('*').eq('id', 'paystack_public_key').single();
-      if (data) setPaystackKey(data.value || '');
+  useEffect(() => {
+    const fetchPublicSettings = async () => {
+      const { data } = await supabase
+        .from('store_settings')
+        .select('*')
+        .in('id', ['paystack_public_key']);
+
+      const publicKey = data?.find((item) => item.id === 'paystack_public_key');
+      if (publicKey?.value) {
+        setPaystackKey(publicKey.value);
+      }
     };
-    fetchKey();
+
+    fetchPublicSettings();
   }, []);
 
+  useEffect(() => {
+    if (!user) return;
+
+    const populateCustomerDetails = async () => {
+      const [firstName, ...rest] = user.name.split(' ');
+      const { data } = await supabase
+        .from('customer_addresses')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_default', true)
+        .maybeSingle();
+      const localAddress = getDefaultAddress(user.id);
+      const defaultAddress = data ? {
+        phone: data.phone,
+        address: data.address,
+        city: data.city,
+        state: data.state,
+      } : localAddress;
+
+      setFormData((current) => ({
+        ...current,
+        firstName: current.firstName || firstName || '',
+        lastName: current.lastName || rest.join(' '),
+        email: current.email || user.email || '',
+        phone: current.phone || defaultAddress?.phone || user.phone || '',
+        address: current.address || defaultAddress?.address || '',
+        city: current.city || defaultAddress?.city || 'Asaba',
+        state: current.state || defaultAddress?.state || 'Delta',
+      }));
+    };
+
+    populateCustomerDetails();
+  }, [user]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    if (errors[e.target.name]) {
-      setErrors({ ...errors, [e.target.name]: '' });
+    const { name, value } = e.target;
+    setFormData((current) => ({ ...current, [name]: value }));
+    if (errors[name]) {
+      setErrors((current) => ({ ...current, [name]: '' }));
     }
   };
 
@@ -58,32 +122,73 @@ export const Checkout = () => {
     if (!formData.email.trim() || !/^\S+@\S+\.\S+$/.test(formData.email)) newErrors.email = 'Valid email is required';
     if (!formData.phone.trim() || formData.phone.length < 10) newErrors.phone = 'Valid phone number is required';
     if (!formData.address.trim()) newErrors.address = 'Address is required';
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const [loading, setLoading] = useState(false);
-
   const handleApplyPromo = async () => {
     if (!promoCodeInput.trim()) return;
     setPromoLoading(true);
-    const { data, error } = await supabase
-      .from('promo_codes')
-      .select('*')
-      .eq('code', promoCodeInput.trim().toUpperCase())
-      .eq('is_active', true)
-      .single();
 
-    if (error || !data) {
-      toast('Invalid or expired promo code', 'error');
+    const { data, error } = await supabase.functions.invoke('validate-promo', {
+      body: { code: promoCodeInput.trim() },
+    });
+
+    if (error || data?.error) {
+      toast(data?.error || error?.message || 'Invalid or expired promo code', 'error');
       setAppliedPromo(null);
     } else {
       toast('Promo code applied!');
       setAppliedPromo(data);
     }
+
     setPromoLoading(false);
   };
+
+  const initializePayment = usePaystackPayment(paystackConfig || { publicKey: paystackKey || 'pending' });
+
+  useEffect(() => {
+    if (!paystackConfig || !loading) return;
+    if (paymentOpenedRef.current) return;
+    paymentOpenedRef.current = true;
+
+    initializePayment({
+      onSuccess: async () => {
+        const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+        const { data, error } = await supabase.functions.invoke('verify-payment', {
+          body: {
+            orderId: paystackConfig.reference,
+            email: formData.email,
+            name: fullName,
+          },
+        });
+
+        if (error || data?.error) {
+          setLoading(false);
+          setPaystackConfig(null);
+          paymentOpenedRef.current = false;
+          toast(data?.error || error?.message || 'Payment verification failed. Please retry from your account.', 'error');
+          navigate('/profile');
+          return;
+        }
+
+        setSuccessMessage('Your payment was confirmed and your order is now processing.');
+        setIsSuccess(true);
+        setLoading(false);
+        setPaystackConfig(null);
+        paymentOpenedRef.current = false;
+        setTimeout(() => navigate('/profile'), 3500);
+      },
+      onClose: () => {
+        setLoading(false);
+        setPaystackConfig(null);
+        paymentOpenedRef.current = false;
+        toast('Payment was not completed. Your pending order is saved in your account so you can finish payment later.', 'info');
+        navigate('/profile');
+      },
+    });
+  }, [formData.email, formData.firstName, formData.lastName, initializePayment, loading, navigate, paystackConfig, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,96 +201,61 @@ export const Checkout = () => {
       toast('Please log in to complete your order.', 'error');
       return;
     }
-    
+
+    if (formData.paymentMethod === 'card' && !paystackKey) {
+      toast('Online card payments are not configured yet. Please choose another payment method or add the Paystack public key in admin settings.', 'error');
+      return;
+    }
+
     setLoading(true);
 
-    if (formData.paymentMethod === 'card') {
-      if (!paystackKey) {
-        toast('Card payments are temporarily unavailable. Please select another method.', 'error');
-        setLoading(false);
-        return;
-      }
-    }
-    
-    // Create the order FIRST, before any payment processing
-    try {
-      const { data: orderData, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          user_id: user.id,
-          total: finalTotal,
-          status: 'pending',
-          shipping_address: `${formData.firstName} ${formData.lastName}\n${formData.address}, ${formData.city}, ${formData.state}\nPhone: ${formData.phone}`,
-          payment_method: formData.paymentMethod
-        })
-        .select()
-        .single();
+    const { data, error } = await supabase.functions.invoke('create-order', {
+      body: {
+        ...formData,
+        promoCode: appliedPromo?.code || promoCodeInput.trim(),
+        cart: cart.map((item) => ({
+          productId: item.product.id,
+          quantity: item.quantity,
+        })),
+      },
+    });
 
-      if (orderError) throw orderError;
-
-      const orderItems = cart.map(item => ({
-        order_id: orderData.id,
-        product_id: item.product.id,
-        quantity: item.quantity,
-        price: item.product.price
-      }));
-
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-
-      if (itemsError) throw itemsError;
-
-      // If Cash on Delivery, we are done
-      if (formData.paymentMethod !== 'card') {
-        handleSuccess();
-        return;
-      }
-
-      // If Card, trigger Paystack with the new order ID as reference
-      setPaystackConfig({
-        reference: orderData.id, // Use actual order ID as reference!
-        email: formData.email,
-        amount: finalTotal * 100, // in kobo
-        publicKey: paystackKey,
-      });
-
-    } catch (error: any) {
-      toast(error.message, 'error');
+    if (error || data?.error) {
       setLoading(false);
+      toast(data?.error || error?.message || 'Unable to place your order right now.', 'error');
+      return;
     }
-  };
 
-  const [paystackConfig, setPaystackConfig] = useState<any>(null);
-  
-  // Provide a dummy config if not ready to prevent hook errors
-  const initializePayment = usePaystackPayment(paystackConfig || { publicKey: paystackKey || 'dummy' });
+    await clearCart();
 
-  React.useEffect(() => {
-    if (paystackConfig && loading) {
-      initializePayment({
-        onSuccess: () => {
-          // Webhook will handle the status update and email. Just show success.
-          handleSuccess();
+    if (formData.paymentMethod === 'card') {
+      paymentOpenedRef.current = false;
+      setPaystackConfig({
+        reference: data.orderId,
+        email: formData.email,
+        amount: Math.round(Number(data.total || finalTotal) * 100),
+        publicKey: paystackKey,
+        metadata: {
+          custom_fields: [
+            {
+              display_name: 'Customer Name',
+              variable_name: 'customer_name',
+              value: `${formData.firstName} ${formData.lastName}`.trim(),
+            },
+          ],
         },
-        onClose: () => {
-          setLoading(false);
-          setPaystackConfig(null);
-          toast('Payment window closed. You can complete your order later in your profile.', 'error');
-        }
       });
+      return;
     }
-  }, [paystackConfig]);
 
-  const handleSuccess = () => {
+    setSuccessMessage(
+      formData.paymentMethod === 'bank_transfer'
+        ? 'Your order is pending confirmation. Our team will contact you with the next steps for payment verification.'
+        : 'Your order has been placed successfully. We will contact you shortly to arrange delivery.',
+    );
     setIsSuccess(true);
-    clearCart();
     setLoading(false);
-    setPaystackConfig(null);
-    
-    setTimeout(() => {
-      navigate('/profile'); // Redirect to profile to see order history
-    }, 4000);
+    setTimeout(() => navigate('/profile'), 3500);
   };
 
   if (isSuccess) {
@@ -194,11 +264,9 @@ export const Checkout = () => {
         <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
           <CheckCircle2 size={40} />
         </div>
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Order Successful!</h2>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-8">
-          Thank you for shopping with Longlife Electronics. We have received your order and will contact you shortly.
-        </p>
-        <p className="text-sm text-gray-500 mb-8">Redirecting you to your profile...</p>
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Order Created Successfully</h2>
+        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-8">{successMessage}</p>
+        <p className="text-sm text-gray-500 mb-8">Redirecting you to your account...</p>
       </div>
     );
   }
@@ -221,19 +289,16 @@ export const Checkout = () => {
   }
 
   if (cart.length === 0) {
-    navigate('/cart');
-    return null;
+    return <Navigate to="/cart" replace />;
   }
 
   return (
     <div className="bg-gray-50 dark:bg-gray-950 min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-8">Checkout</h1>
-        
+
         <form onSubmit={handleSubmit} className="flex flex-col-reverse lg:flex-row gap-8">
-          
           <div className="w-full lg:w-2/3 space-y-6">
-            {/* Contact Info */}
             <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Contact Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -260,7 +325,6 @@ export const Checkout = () => {
               </div>
             </div>
 
-            {/* Shipping Address */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
               <h2 className="text-xl font-black text-slate-900 dark:text-white mb-6 uppercase tracking-tighter">Delivery Address</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -285,7 +349,6 @@ export const Checkout = () => {
               </div>
             </div>
 
-            {/* Payment Method */}
             <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Payment Method</h2>
               <div className="space-y-3">
@@ -299,21 +362,23 @@ export const Checkout = () => {
                 </label>
                 <label className="flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                   <input type="radio" name="paymentMethod" value="card" checked={formData.paymentMethod === 'card'} onChange={handleChange} className="w-4 h-4 text-red-600 focus:ring-red-500" />
-                  <span className="ml-3 font-medium text-gray-900 dark:text-white flex items-center justify-between w-full">
-                    Online Card Payment
-                  </span>
+                  <span className="ml-3 font-medium text-gray-900 dark:text-white">Online Card Payment</span>
                 </label>
               </div>
+              {formData.paymentMethod === 'card' && (
+                <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                  Card orders are reserved immediately and stay in your account as pending until payment is completed.
+                </p>
+              )}
             </div>
           </div>
-          
-          {/* Order Summary Sidebar */}
+
           <div className="w-full lg:w-1/3">
             <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 sticky top-24 shadow-sm">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Order Summary</h2>
-              
+
               <div className="space-y-4 mb-6 max-h-60 overflow-y-auto pr-2">
-                {cart.map(({product, quantity}) => (
+                {cart.map(({ product, quantity }) => (
                   <div key={product.id} className="flex justify-between gap-4">
                     <div className="flex gap-3">
                       <div className="relative">
@@ -345,18 +410,18 @@ export const Checkout = () => {
                   <span>Shipping</span>
                   <span className="font-medium text-gray-900 dark:text-white">Free</span>
                 </div>
-                
+
                 <div className="pt-3 pb-3 border-t border-b border-gray-100 dark:border-gray-800">
                   <div className="flex gap-2">
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       value={promoCodeInput}
-                      onChange={e => setPromoCodeInput(e.target.value)}
-                      placeholder="Promo Code" 
+                      onChange={(e) => setPromoCodeInput(e.target.value)}
+                      placeholder="Promo Code"
                       className="flex-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-2 rounded text-sm uppercase focus:outline-none focus:border-red-600"
                     />
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={handleApplyPromo}
                       disabled={promoLoading || !promoCodeInput.trim()}
                       className="bg-gray-900 dark:bg-white hover:bg-gray-800 text-white dark:text-gray-900 px-4 py-2 rounded text-xs font-bold uppercase tracking-widest disabled:opacity-50"
@@ -371,8 +436,8 @@ export const Checkout = () => {
                   <span className="text-2xl font-bold text-red-600">{formatCurrency(finalTotal)}</span>
                 </div>
               </div>
-              
-              <button 
+
+              <button
                 type="submit"
                 disabled={loading}
                 className="w-full mt-6 bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
@@ -381,7 +446,6 @@ export const Checkout = () => {
               </button>
             </div>
           </div>
-
         </form>
       </div>
     </div>

@@ -15,6 +15,7 @@ export const mockProducts: Product[] = [
       'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&q=80&w=800'
     ],
     inStock: true,
+    stock: 12,
     rating: 4.5,
     reviewsCount: 128,
     isPopular: true,
@@ -38,6 +39,7 @@ export const mockProducts: Product[] = [
       'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?auto=format&fit=crop&q=80&w=800'
     ],
     inStock: true,
+    stock: 8,
     rating: 4.8,
     reviewsCount: 84,
     isPopular: true,
@@ -62,6 +64,7 @@ export const mockProducts: Product[] = [
       'https://images.unsplash.com/photo-1620619861614-239634e94119?auto=format&fit=crop&q=80&w=800'
     ],
     inStock: true,
+    stock: 6,
     rating: 4.6,
     reviewsCount: 56,
     isNew: true,
@@ -85,6 +88,7 @@ export const mockProducts: Product[] = [
       'https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?auto=format&fit=crop&q=80&w=800'
     ],
     inStock: true,
+    stock: 5,
     rating: 4.3,
     reviewsCount: 42,
     specs: {
@@ -106,6 +110,7 @@ export const mockProducts: Product[] = [
       'https://images.unsplash.com/photo-1545454675-a6a61fa31e48?auto=format&fit=crop&q=80&w=800'
     ],
     inStock: false,
+    stock: 0,
     rating: 4.7,
     reviewsCount: 91,
     isPopular: true,
@@ -129,6 +134,7 @@ export const mockProducts: Product[] = [
       'https://images.unsplash.com/photo-1585060544812-6b45742d762f?auto=format&fit=crop&q=80&w=800'
     ],
     inStock: true,
+    stock: 10,
     rating: 4.4,
     reviewsCount: 33,
     specs: {
@@ -150,6 +156,7 @@ export const mockProducts: Product[] = [
       'https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?auto=format&fit=crop&q=80&w=800'
     ],
     inStock: true,
+    stock: 14,
     rating: 4.2,
     reviewsCount: 19,
     specs: {
@@ -171,6 +178,7 @@ export const mockProducts: Product[] = [
       'https://images.unsplash.com/photo-1601944179066-29786cb9d32a?auto=format&fit=crop&q=80&w=800'
     ],
     inStock: true,
+    stock: 4,
     rating: 4.9,
     reviewsCount: 45,
     isNew: true,

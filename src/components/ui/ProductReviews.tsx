@@ -20,7 +20,7 @@ export const ProductReviews = ({ productId, rating, reviewsCount }: ProductRevie
     const fetchReviews = async () => {
       const { data } = await supabase
         .from('product_reviews')
-        .select(`*, profiles(name)`)
+        .select('*')
         .eq('product_id', productId)
         .order('created_at', { ascending: false });
       
@@ -49,7 +49,7 @@ export const ProductReviews = ({ productId, rating, reviewsCount }: ProductRevie
       toast('Review submitted successfully!');
       setShowReviewForm(false);
       setForm({ rating: 5, comment: '' });
-      const { data } = await supabase.from('product_reviews').select(`*, profiles(name)`).eq('product_id', productId).order('created_at', { ascending: false });
+      const { data } = await supabase.from('product_reviews').select('*').eq('product_id', productId).order('created_at', { ascending: false });
       if (data) setReviews(data);
     }
     setSubmitting(false);
@@ -116,7 +116,7 @@ export const ProductReviews = ({ productId, rating, reviewsCount }: ProductRevie
             <div key={review.id} className="border-b border-slate-100 dark:border-slate-800 pb-6 last:border-0 last:pb-0">
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <span className="font-bold text-[13px] text-slate-900 dark:text-white mr-3">{review.profiles?.name || 'Anonymous'}</span>
+                  <span className="font-bold text-[13px] text-slate-900 dark:text-white mr-3">{review.reviewer_name || 'Customer'}</span>
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{new Date(review.created_at).toLocaleDateString()}</span>
                 </div>
                 <div className="flex items-center text-yellow-400">

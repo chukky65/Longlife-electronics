@@ -17,13 +17,14 @@ export const CookieConsent = () => {
 
   const handleAccept = () => {
     localStorage.setItem('longlife_cookie_consent', 'true');
+    window.dispatchEvent(new CustomEvent('longlife:cookie-consent', { detail: true }));
     setIsVisible(false);
   };
 
   const handleClose = () => {
+    localStorage.setItem('longlife_cookie_consent', 'false');
+    window.dispatchEvent(new CustomEvent('longlife:cookie-consent', { detail: false }));
     setIsVisible(false);
-    // Optionally don't set local storage so it asks again next time,
-    // or set it to false if you want to track decline, but we just dismiss it here.
   };
 
   if (!isVisible) return null;
@@ -40,7 +41,7 @@ export const CookieConsent = () => {
               Privacy & Cookies
             </h4>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl">
-              We use cookies and local storage to enhance your browsing experience, save your preferences, and analyze our traffic. By clicking "Accept", you consent to our use of cookies and data storage.
+              Essential storage keeps your cart and preferences working. Analytics is optional and loads only if you accept it.
             </p>
           </div>
         </div>
@@ -49,7 +50,7 @@ export const CookieConsent = () => {
             onClick={handleClose}
             className="text-[11px] font-bold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white uppercase tracking-widest transition-colors px-4 py-2"
           >
-            Dismiss
+            Reject Optional
           </button>
           <button 
             onClick={handleAccept}

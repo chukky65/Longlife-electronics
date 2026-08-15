@@ -45,16 +45,10 @@ async function run() {
     const slug = product.slug;
     const destPath = path.join(imgDir, `${slug}.png`);
     
-    // Skip if already downloaded
-    if (fs.existsSync(destPath)) {
-      console.log(`[${i+1}/${products.length}] Skipping ${product.name} - already downloaded`);
-      product.image = `/images/products/${slug}.png`;
-      continue;
-    }
-
     try {
       console.log(`[${i+1}/${products.length}] Searching for: ${product.name}`);
-      const query = encodeURIComponent(product.name + " png transparent");
+      // Use a more targeted search query for authentic product photos
+      const query = encodeURIComponent(product.name + " appliance nigeria");
       await page.goto(`https://www.bing.com/images/search?q=${query}`, { waitUntil: 'domcontentloaded' });
       
       // Wait for the first image result to appear

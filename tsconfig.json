@@ -22,5 +22,20 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
-  }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.d.ts",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules",
+    "supabase",
+    "*.cjs",
+    "*.js",
+    "test_*.cjs",
+    "test_*.js"
+  ]
 }

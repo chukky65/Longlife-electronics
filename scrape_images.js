@@ -16,7 +16,7 @@ const downloadImage = (url, filepath) => {
            .once('close', () => resolve(filepath));
       } else {
         res.resume();
-        reject(new Error(\`Request Failed With a Status Code: \${res.statusCode}\`));
+        reject(new Error(`Request Failed With a Status Code: ${res.statusCode}`));
       }
     }).on('error', reject);
   });
@@ -38,19 +38,19 @@ async function run() {
   for (let i = 0; i < products.length; i++) {
     const product = products[i];
     const slug = product.slug;
-    const destPath = path.join(imgDir, \`\${slug}.png\`);
+    const destPath = path.join(imgDir, `${slug}.png`);
     
     // Skip if already downloaded
     if (fs.existsSync(destPath)) {
-      console.log(\`[\${i+1}/\${products.length}] Skipping \${product.name} - already downloaded\`);
-      product.image = \`/images/products/\${slug}.png\`;
+       console.log(`[${i + 1}/${products.length}] Skipping ${product.name} - already downloaded`);
+       product.image = `/images/products/${slug}.png`;
       continue;
     }
 
     try {
-      console.log(\`[\${i+1}/\${products.length}] Searching for: \${product.name}\`);
+      console.log(`[${i + 1}/${products.length}] Searching for: ${product.name}`);
       const query = encodeURIComponent(product.name + " png transparent");
-      await page.goto(\`https://www.bing.com/images/search?q=\${query}\`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`https://www.bing.com/images/search?q=${query}`, { waitUntil: 'domcontentloaded' });
       
       // Wait for the first image result to appear
       await page.waitForSelector('.mimg', { timeout: 5000 }).catch(() => {});
@@ -61,7 +61,7 @@ async function run() {
       });
 
       if (imgUrl) {
-        console.log(\`Found image for \${product.name}: \${imgUrl.substring(0, 50)}...\`);
+        console.log(`Found image for ${product.name}: ${imgUrl.substring(0, 50)}...`);
         let finalUrl = imgUrl;
         if (finalUrl.startsWith('//')) {
           finalUrl = 'https:' + finalUrl;
@@ -69,15 +69,15 @@ async function run() {
           finalUrl = 'https://www.bing.com' + finalUrl;
         }
         await downloadImage(finalUrl, destPath);
-        product.image = \`/images/products/\${slug}.png\`;
+        product.image = `/images/products/${slug}.png`;
       } else {
-        console.log(\`No image found for \${product.name}, using dummy.\`);
+        console.log(`No image found for ${product.name}, using dummy.`);
         // Fallback to dummy if search fails
-        product.image = \`https://dummyimage.com/800x800.png?text=\${encodeURIComponent(product.name)}\`;
+        product.image = `https://dummyimage.com/800x800.png?text=${encodeURIComponent(product.name)}`;
       }
     } catch (err) {
-      console.log(\`Error processing \${product.name}: \${err.message}\`);
-      product.image = \`https://dummyimage.com/800x800.png?text=\${encodeURIComponent(product.name)}\`;
+      console.log(`Error processing ${product.name}: ${err.message}`);
+      product.image = `https://dummyimage.com/800x800.png?text=${encodeURIComponent(product.name)}`;
     }
     
     // Delay to prevent rate limiting

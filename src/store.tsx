@@ -211,42 +211,31 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const addToCart = async (product: Product, quantity = 1) => {
-    let quantityAdded = 0;
-    setCart(prev => {
-      const existing = prev.find(item => item.product.id === product.id);
-      
-      if (existing) {
-        const newQty = Math.min(product.stock, existing.quantity + quantity);
-        quantityAdded = newQty - existing.quantity;
-        if (quantityAdded === 0) return prev;
-        
-        return prev.map(item => 
-          item.product.id === product.id 
-            ? { ...item, quantity: newQty }
-            : item
-        );
-      }
-      
-      quantityAdded = Math.min(product.stock, quantity);
-      if (quantityAdded === 0) return prev;
-      
-      return [...prev, { product, quantity: quantityAdded }];
-    });
-    
-    // We didn't add anything, so don't toast or update DB
+    const existing = cart.find(item => item.product.id === product.id);
+    const nextQuantity = Math.min(product.stock, (existing?.quantity || 0) + quantity);
+    const quantityAdded = nextQuantity - (existing?.quantity || 0);
+
     if (quantityAdded === 0) {
       toast(`Cannot add more ${product.name}, stock limit reached`, 'error');
       return;
     }
-    
+
+    setCart(prev => {
+      const current = prev.find(item => item.product.id === product.id);
+      if (current) {
+        return prev.map(item => item.product.id === product.id ? { ...item, quantity: nextQuantity } : item);
+      }
+      return [...prev, { product, quantity: nextQuantity }];
+    });
+
     toast(`Added ${product.name} to cart`);
 
     if (user) {
       const { data: existing } = await supabase.from('cart_items').select('*').eq('user_id', user.id).eq('product_id', product.id).single();
       if (existing) {
-        await supabase.from('cart_items').update({ quantity: existing.quantity + quantity }).eq('id', existing.id);
+        await supabase.from('cart_items').update({ quantity: existing.quantity + quantityAdded }).eq('id', existing.id);
       } else {
-        await supabase.from('cart_items').insert({ user_id: user.id, product_id: product.id, quantity });
+        await supabase.from('cart_items').insert({ user_id: user.id, product_id: product.id, quantity: quantityAdded });
       }
     }
   };
@@ -266,18 +255,15 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       return;
     }
     
-    setCart(prev => {
-      const item = prev.find(i => i.product.id === productId);
-      if (!item) return prev;
-      
-      const newQty = Math.min(item.product.stock, quantity);
-      return prev.map(i => 
-        i.product.id === productId ? { ...i, quantity: newQty } : i
-      );
-    });
+    const item = cart.find(current => current.product.id === productId);
+    if (!item) return;
+    const boundedQty = Math.min(item.product.stock, quantity);
+    setCart(prev => prev.map(current =>
+      current.product.id === productId ? { ...current, quantity: boundedQty } : current
+    ));
 
     if (user) {
-      await supabase.from('cart_items').update({ quantity }).eq('user_id', user.id).eq('product_id', productId);
+      await supabase.from('cart_items').update({ quantity: boundedQty }).eq('user_id', user.id).eq('product_id', productId);
     }
   };
 
@@ -291,21 +277,16 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const toggleWishlist = async (product: Product) => {
-    let isAdding = false;
-    setWishlist(prev => {
-      const exists = prev.some(p => p.id === product.id);
-      if (exists) {
-        toast('Removed from wishlist', 'info');
-        return prev.filter(p => p.id !== product.id);
-      }
-      toast('Added to wishlist');
-      isAdding = true;
-      return [...prev, product];
-    });
+    const isAdding = !wishlist.some(item => item.id === product.id);
+    setWishlist(prev => isAdding ? [...prev, product] : prev.filter(item => item.id !== product.id));
+    toast(isAdding ? 'Added to wishlist' : 'Removed from wishlist', isAdding ? 'success' : 'info');
 
     if (user) {
       if (isAdding) {
-        await supabase.from('wishlist_items').insert({ user_id: user.id, product_id: product.id });
+        await supabase.from('wishlist_items').upsert(
+          { user_id: user.id, product_id: product.id },
+          { onConflict: 'user_id,product_id' },
+        );
       } else {
         await supabase.from('wishlist_items').delete().eq('user_id', user.id).eq('product_id', product.id);
       }

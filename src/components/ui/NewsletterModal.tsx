@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { X, Mail, ArrowRight } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { supabase } from '../../lib/supabase';
+import { useStore } from '../../store';
 
 export const NewsletterModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const location = useLocation();
+  const { toast } = useStore();
 
   useEffect(() => {
     const hasSeenModal = localStorage.getItem('longlife_newsletter_seen');
@@ -23,14 +27,24 @@ export const NewsletterModal = () => {
     localStorage.setItem('longlife_newsletter_seen', 'true');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      setIsSubmitted(true);
-      setTimeout(() => {
-        handleClose();
-      }, 2000);
+    if (!email || isSubmitting) return;
+
+    setIsSubmitting(true);
+    const { data, error } = await supabase.functions.invoke('subscribe-newsletter', {
+      body: { email },
+    });
+    setIsSubmitting(false);
+
+    if (error || data?.error) {
+      toast(data?.error || error?.message || 'Unable to subscribe right now.', 'error');
+      return;
     }
+
+    setIsSubmitted(true);
+    localStorage.setItem('longlife_newsletter_seen', 'true');
+    setTimeout(() => handleClose(), 2000);
   };
 
   if (!isOpen) return null;
@@ -86,9 +100,10 @@ export const NewsletterModal = () => {
                   </div>
                   <button 
                     type="submit"
-                    className="w-full bg-slate-900 hover:bg-red-600 dark:bg-white dark:hover:bg-red-600 dark:text-slate-900 dark:hover:text-white text-white font-bold py-3 px-6 text-[11px] uppercase tracking-widest transition-colors flex items-center justify-center gap-2"
+                    disabled={isSubmitting}
+                    className="w-full bg-slate-900 hover:bg-red-600 dark:bg-white dark:hover:bg-red-600 dark:text-slate-900 dark:hover:text-white text-white font-bold py-3 px-6 text-[11px] uppercase tracking-widest transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    Subscribe <ArrowRight size={14} />
+                    {isSubmitting ? 'Subscribing...' : 'Subscribe'} <ArrowRight size={14} />
                   </button>
                 </form>
                 <p className="text-[9px] text-slate-400 mt-4 text-center">

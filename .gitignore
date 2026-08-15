@@ -6,3 +6,14 @@ coverage/
 *.log
 .env*
 !.env.example
+.netlify/
+supabase/.temp/
+extracted_images_2/
+media__*.json
+media__*.content.txt
+auto_update_*.cjs
+inject_*.cjs
+link_images*.cjs
+test_*.cjs
+update_json.cjs
+upload_to_storage.cjs

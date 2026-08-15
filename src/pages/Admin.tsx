@@ -5,6 +5,7 @@ import { useStore } from '../store';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Product, Category, CATEGORIES } from '../types';
+import { formatCurrency } from '../utils';
 import productsToImport from '../importData.json';
 
 export const Admin = () => {
@@ -42,8 +43,6 @@ export const Admin = () => {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
   const [paystackKey, setPaystackKey] = useState('');
-  const [paystackSecretKey, setPaystackSecretKey] = useState('');
-  const [resendApiKey, setResendApiKey] = useState('');
   const [analyticsId, setAnalyticsId] = useState('');
   const [savingSettings, setSavingSettings] = useState(false);
 
@@ -69,16 +68,11 @@ export const Admin = () => {
 
 const handleBulkImport = async () => {
   try {
-    toast('Deleting old products...', 'info');
-    
-    // Attempt to delete all existing products first
-    await supabase.from('products').delete().neq('price', -1);
-    
     toast('Starting bulk import...', 'info');
-    const { error } = await supabase.from('products').insert(productsToImport);
+    const { error } = await supabase.from('products').upsert(productsToImport, { onConflict: 'slug' });
     if (error) throw error;
-    
-    toast('Successfully imported 78 products!', 'success');
+
+    toast(`Successfully synchronized ${productsToImport.length} products!`, 'success');
     fetchProducts();
   } catch (err: any) {
     toast(err.message || 'Import failed', 'error');
@@ -116,13 +110,9 @@ const handleBulkImport = async () => {
     const { data } = await supabase.from('store_settings').select('*');
     if (data) {
       const publicK = data.find(s => s.id === 'paystack_public_key');
-      const secretK = data.find(s => s.id === 'paystack_secret_key');
-      const resendK = data.find(s => s.id === 'resend_api_key');
       const analyticsId = data.find(s => s.id === 'analytics_id');
       
       if (publicK) setPaystackKey(publicK.value || '');
-      if (secretK) setPaystackSecretKey(secretK.value || '');
-      if (resendK) setResendApiKey(resendK.value || '');
       if (analyticsId) setAnalyticsId(analyticsId.value || '');
     }
   };
@@ -171,8 +161,6 @@ const handleBulkImport = async () => {
     setSavingSettings(true);
     const { error } = await supabase.from('store_settings').upsert([
       { id: 'paystack_public_key', value: paystackKey },
-      { id: 'paystack_secret_key', value: paystackSecretKey },
-      { id: 'resend_api_key', value: resendApiKey },
       { id: 'analytics_id', value: analyticsId }
     ]);
     if (error) {
@@ -187,7 +175,14 @@ const handleBulkImport = async () => {
     setOrdersLoading(true);
     const { data, error } = await supabase
       .from('orders')
-      .select('*')
+      .select(`
+        *,
+        profiles (
+          name,
+          phone
+        )
+      `)
+      .is('archived_at', null)
       .order('created_at', { ascending: false });
       
     if (error) {
@@ -224,19 +219,51 @@ const handleBulkImport = async () => {
   };
 
   const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
-    const { error } = await supabase
-      .from('orders')
-      .update({ status: newStatus })
-      .eq('id', orderId);
+    const requiresRefundConfirmation =
+      newStatus === 'cancelled' &&
+      selectedOrder?.payment_method === 'card' &&
+      selectedOrder?.status !== 'pending';
+
+    if (requiresRefundConfirmation && !window.confirm('Confirm that this card payment has already been refunded in Paystack. Cancelling will restore the product stock.')) {
+      return;
+    }
+
+    const { data, error } = await supabase.functions.invoke('manage-order', {
+      body: {
+        orderId,
+        action: 'update_status',
+        status: newStatus,
+        refundConfirmed: requiresRefundConfirmation,
+      }
+    });
       
-    if (error) {
-      toast(error.message, 'error');
+    if (error || data?.error) {
+      toast(data?.error || error?.message || 'Unable to update the order', 'error');
     } else {
       toast(`Order status updated to ${newStatus}`);
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
+    }
+  };
+
+  const handleArchiveOrder = async (orderId: string) => {
+    if (!window.confirm('Archive this cancelled order from the admin queue? Its financial record will be retained.')) return;
+    const { data, error } = await supabase.functions.invoke('manage-order', {
+      body: {
+        orderId,
+        action: 'archive'
+      }
+    });
+
+    if (error || data?.error) {
+      toast(data?.error || error?.message || 'Unable to archive the order', 'error');
+    } else {
+      toast('Order archived successfully');
+      setOrders(prev => prev.filter(o => o.id !== orderId));
+      setIsOrderModalOpen(false);
+      setSelectedOrder(null);
     }
   };
 
@@ -478,7 +505,7 @@ const handleBulkImport = async () => {
                 >
                   <div>
                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Sales</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">₦{dashboardData.totalSales.toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(dashboardData.totalSales)}</p>
                   </div>
                   <div className="w-12 h-12 bg-green-50 dark:bg-green-900/20 text-green-600 rounded-full flex items-center justify-center">
                     <DollarSign size={24} />
@@ -518,7 +545,7 @@ const handleBulkImport = async () => {
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={dashboardData.chartData}>
                       <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                      <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `₦${value}`} />
+                      <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => formatCurrency(Number(value))} />
                       <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
                       <Bar dataKey="Sales" fill="#dc2626" radius={[4, 4, 0, 0]} />
                     </BarChart>
@@ -579,7 +606,7 @@ const handleBulkImport = async () => {
                             </span>
                           </td>
                           <td className="px-6 py-4 font-bold text-gray-900 dark:text-white">
-                            ₦{o.total.toLocaleString()}
+                            {formatCurrency(o.total)}
                           </td>
                           <td className="px-6 py-4 text-right">
                             <button 
@@ -640,7 +667,7 @@ const handleBulkImport = async () => {
                             </div>
                           </td>
                           <td className="px-6 py-4 text-gray-500 dark:text-gray-400">{p.category}</td>
-                          <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">₦{p.price.toLocaleString()}</td>
+                          <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{formatCurrency(p.price)}</td>
                           <td className="px-6 py-4">
                             <span className={`px-2 py-1 rounded text-xs font-bold ${p.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                               {p.stock > 0 ? `${p.stock} in stock` : 'Out of Stock'}
@@ -721,7 +748,7 @@ const handleBulkImport = async () => {
                           <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
                             <td className="px-6 py-4 font-bold text-gray-900 dark:text-white font-mono">{p.code}</td>
                             <td className="px-6 py-4 font-medium text-red-600">
-                              {p.discount_percent ? `${p.discount_percent}% OFF` : `₦${p.discount_amount?.toLocaleString()} OFF`}
+                              {p.discount_percent ? `${p.discount_percent}% OFF` : `${formatCurrency(p.discount_amount || 0)} OFF`}
                             </td>
                             <td className="px-6 py-4">
                               <button onClick={() => handleTogglePromo(p.id, p.is_active)} className={`px-2 py-1 rounded text-xs font-bold ${p.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600'}`}>
@@ -745,7 +772,7 @@ const handleBulkImport = async () => {
 
           {activeTab === 'settings' && (
             <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm overflow-hidden p-6 max-w-2xl">
-              <h3 className="font-bold text-gray-900 dark:text-white mb-6">Payment Settings</h3>
+              <h3 className="font-bold text-gray-900 dark:text-white mb-6">Storefront Settings</h3>
               <form onSubmit={handleSaveSettings} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Paystack Public Key</label>
@@ -762,36 +789,10 @@ const handleBulkImport = async () => {
                 </div>
                 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
-                  <h4 className="font-bold text-gray-900 dark:text-white mb-4 text-sm">Secure Backend Keys</h4>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Paystack Secret Key</label>
-                      <input 
-                        type="password" 
-                        value={paystackSecretKey} 
-                        onChange={e => setPaystackSecretKey(e.target.value)} 
-                        placeholder="Secret Key (sk_test_... or sk_live_...)"
-                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 rounded focus:outline-none focus:border-red-600 font-mono text-sm"
-                      />
-                      <p className="mt-2 text-xs text-gray-500">
-                        Kept secret. Used by the backend to securely verify successful payments.
-                      </p>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Resend API Key</label>
-                      <input 
-                        type="password" 
-                        value={resendApiKey} 
-                        onChange={e => setResendApiKey(e.target.value)} 
-                        placeholder="re_xxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 rounded focus:outline-none focus:border-red-600 font-mono text-sm"
-                      />
-                      <p className="mt-2 text-xs text-gray-500">
-                        Used to automatically send email receipts to customers after successful payment.
-                      </p>
-                    </div>
+                  <h4 className="font-bold text-gray-900 dark:text-white mb-4 text-sm">Server Secrets</h4>
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-100">
+                    Paystack secret keys and Resend API keys are intentionally no longer editable in the browser.
+                    Set `PAYSTACK_SECRET_KEY`, `RESEND_API_KEY`, and optionally `RESEND_FROM_EMAIL` in your Supabase Edge Function environment before deployment.
                   </div>
                 </div>
 
@@ -988,7 +989,7 @@ const handleBulkImport = async () => {
                 <table className="w-full text-left">
                   <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-800">
                     <tr>
-                      <th className="px-4 py-2 text-xs font-medium text-gray-500">Product</th>
+                      <th className="px-4 py-2 text-xs font-medium text-gray-500">Product & Stock</th>
                       <th className="px-4 py-2 text-xs font-medium text-gray-500 text-center">Qty</th>
                       <th className="px-4 py-2 text-xs font-medium text-gray-500 text-right">Price</th>
                       <th className="px-4 py-2 text-xs font-medium text-gray-500 text-right">Total</th>
@@ -1007,8 +1008,8 @@ const handleBulkImport = async () => {
                             <span className="font-medium text-sm text-gray-900 dark:text-white line-clamp-1">{item.products?.name || 'Deleted Product'}</span>
                           </td>
                           <td className="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-white">{item.quantity}</td>
-                          <td className="px-4 py-3 text-right text-sm text-gray-600 dark:text-gray-400">₦{item.price.toLocaleString()}</td>
-                          <td className="px-4 py-3 text-right text-sm font-bold text-gray-900 dark:text-white">₦{(item.price * item.quantity).toLocaleString()}</td>
+                          <td className="px-4 py-3 text-right text-sm text-gray-600 dark:text-gray-400">{formatCurrency(item.price)}</td>
+                          <td className="px-4 py-3 text-right text-sm font-bold text-gray-900 dark:text-white">{formatCurrency(item.price * item.quantity)}</td>
                         </tr>
                       ))
                     )}
@@ -1016,7 +1017,7 @@ const handleBulkImport = async () => {
                   <tfoot className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-800">
                     <tr>
                       <td colSpan={3} className="px-4 py-3 text-right text-sm font-bold text-gray-900 dark:text-white">Order Total:</td>
-                      <td className="px-4 py-3 text-right text-lg font-black text-red-600">₦{selectedOrder.total.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-right text-lg font-black text-red-600">{formatCurrency(selectedOrder.total)}</td>
                     </tr>
                   </tfoot>
                 </table>
@@ -1024,9 +1025,16 @@ const handleBulkImport = async () => {
             </div>
             
             <div className="p-6 border-t border-gray-200 dark:border-gray-800 flex justify-end">
-              <button onClick={() => setIsOrderModalOpen(false)} className="bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-bold py-2 px-6 rounded transition-colors">
-                Close
-              </button>
+              <div className="flex gap-4">
+                {selectedOrder.status === 'cancelled' && (
+                  <button onClick={() => handleArchiveOrder(selectedOrder.id)} className="bg-red-50 hover:bg-red-100 text-red-600 font-bold py-2 px-6 rounded transition-colors uppercase tracking-widest text-xs">
+                    Archive Order
+                  </button>
+                )}
+                <button onClick={() => setIsOrderModalOpen(false)} className="bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-bold py-2 px-6 rounded transition-colors uppercase tracking-widest text-xs">
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

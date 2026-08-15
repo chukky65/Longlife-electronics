@@ -61,7 +61,13 @@ export const QuickViewModal = ({ product, onClose }: QuickViewModalProps) => {
               </div>
             </div>
 
-            <p className="text-[13px] text-slate-600 dark:text-slate-400 leading-relaxed mb-8">
+            <div className="flex items-center gap-1.5 mt-2">
+              <span className={`inline-flex items-center justify-center px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest ${product.stock > 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                {product.stock > 0 ? `${product.stock} In Stock` : 'Out of Stock'}
+              </span>
+            </div>
+
+            <p className="text-[13px] text-slate-600 dark:text-slate-400 leading-relaxed flex-1 mt-4">
               {product.description.substring(0, 150)}...
             </p>
 
@@ -71,11 +77,11 @@ export const QuickViewModal = ({ product, onClose }: QuickViewModalProps) => {
                   addToCart(product);
                   onClose();
                 }}
-                disabled={!product.inStock}
+                disabled={product.stock <= 0}
                 className="flex-1 bg-slate-900 hover:bg-red-600 dark:bg-white dark:hover:bg-red-600 dark:text-slate-900 dark:hover:text-white text-white font-bold py-4 px-6 text-[11px] uppercase tracking-widest transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ShoppingCart size={16} />
-                {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+                {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
               </button>
               <a
                 href={`https://wa.me/2349069361175?text=${encodeURIComponent(whatsappMsg)}`}

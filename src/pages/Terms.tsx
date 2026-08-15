@@ -16,7 +16,7 @@ export const Terms = () => {
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">Terms & Conditions</h1>
         
         <div className="prose prose-lg dark:prose-invert max-w-none text-gray-600 dark:text-gray-300">
-          <p className="mb-6">Last updated: {new Date().toLocaleDateString()}</p>
+          <p className="mb-6">Last updated: 13 August 2026</p>
           
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-8 mb-4">1. Agreement to Terms</h2>
           <p className="mb-6">

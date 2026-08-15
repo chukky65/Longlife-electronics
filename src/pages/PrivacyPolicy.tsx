@@ -16,7 +16,7 @@ export const PrivacyPolicy = () => {
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">Privacy Policy</h1>
         
         <div className="prose prose-lg dark:prose-invert max-w-none text-gray-600 dark:text-gray-300">
-          <p className="mb-6">Last updated: {new Date().toLocaleDateString()}</p>
+          <p className="mb-6">Last updated: 13 August 2026</p>
           
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-8 mb-4">1. Introduction</h2>
           <p className="mb-6">
@@ -32,7 +32,7 @@ export const PrivacyPolicy = () => {
           <ul className="list-disc pl-6 mb-6 space-y-2">
             <li><strong>Identity Data:</strong> includes first name, last name, username or similar identifier.</li>
             <li><strong>Contact Data:</strong> includes billing address, delivery address, email address and telephone numbers.</li>
-            <li><strong>Financial Data:</strong> includes payment card details (processed securely via our payment partners like Paystack).</li>
+            <li><strong>Payment Data:</strong> card details are collected and processed by Paystack. We receive the transaction reference, amount, and payment status, not your full card details.</li>
             <li><strong>Transaction Data:</strong> includes details about payments to and from you and other details of products you have purchased from us.</li>
           </ul>
 
